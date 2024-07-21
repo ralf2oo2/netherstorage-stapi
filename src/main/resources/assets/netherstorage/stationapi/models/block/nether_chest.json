@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/orientable",
+  "textures": {
+    "top": "netherstorage:block/nether_chest_top",
+    "front": "netherstorage:block/nether_chest_front",
+    "side": "netherstorage:block/nether_chest_side"
+  }
+}
