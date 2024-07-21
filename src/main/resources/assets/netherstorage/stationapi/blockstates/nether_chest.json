@@ -5,21 +5,21 @@
       "y": 90
     },
     "facing=east,protected=true": {
-      "model": "minecraft:block/furnace_on",
+      "model": "netherstorage:block/nether_chest_protected",
       "y": 90
     },
     "facing=north,protected=false": {
       "model": "netherstorage:block/nether_chest"
     },
     "facing=north,protected=true": {
-      "model": "minecraft:block/furnace_on"
+      "model": "netherstorage:block/nether_chest_protected"
     },
     "facing=south,protected=false": {
       "model": "netherstorage:block/nether_chest",
       "y": 180
     },
     "facing=south,protected=true": {
-      "model": "minecraft:block/furnace_on",
+      "model": "netherstorage:block/nether_chest_protected",
       "y": 180
     },
     "facing=west,protected=false": {
@@ -27,7 +27,7 @@
       "y": 270
     },
     "facing=west,protected=true": {
-      "model": "minecraft:block/furnace_on",
+      "model": "netherstorage:block/nether_chest_protected",
       "y": 270
     }
   }

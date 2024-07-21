@@ -3,11 +3,18 @@ package ralf2oo2.netherstorage.block;
 import net.minecraft.block.Block;
 import net.minecraft.block.Material;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.DispenserBlockEntity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.ArrowEntity;
+import net.minecraft.entity.projectile.thrown.EggEntity;
+import net.minecraft.entity.projectile.thrown.SnowballEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.modificationstation.stationapi.api.block.BlockState;
 import net.modificationstation.stationapi.api.state.StateManager;
@@ -31,6 +38,8 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
     public static final BooleanProperty PROTECTED = BooleanProperty.of("protected");
     public NetherChestBlock(Identifier identifier, Material material) {
         super(identifier, material);
+        setHardness(0.4F);
+        setSoundGroup(STONE_SOUND_GROUP);
         setDefaultState(getDefaultState().with(FACING, Direction.NORTH).with(PROTECTED, false));
     }
 
@@ -68,17 +77,111 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
     public boolean onUse(World world, int x, int y, int z, PlayerEntity player) {
         NetherChestBlockEntity blockEntity = (NetherChestBlockEntity) world.getBlockEntity(x, y, z);
         if(player.getHand() != null && !world.isRemote){
-           if(player.getHand().itemId == ItemRegistry.netherChannelEditorItem.id){
-               NetherStorageClient.showChannelScreen(player.inventory, blockEntity);
-           }
-           else {
-               player.method_486(blockEntity);
-           }
+            if(player.getHand().itemId == ItemRegistry.netherChannelEditorItem.id){
+                NetherStorageClient.showChannelScreen(player.inventory, blockEntity);
+            }
+            else if(player.getHand().itemId == ItemRegistry.netherLabelItem.id){
+                NetherStorageClient.showLabelScreen(blockEntity.getKey());
+            }
+            else if(player.getHand().itemId == Item.DIAMOND.id && !world.getBlockState(x, y, z).get(PROTECTED).booleanValue()){
+                if(hitChestLock(world, x, y, z, player)){
+                    world.setBlockState(x, y, z, world.getBlockState(x, y, z).with(PROTECTED, true));
+                    world.method_246(x, y, z);
+                    player.getHand().count--;
+                }
+                else {
+                    player.method_486(blockEntity);
+                }
+            }
+            else {
+                player.method_486(blockEntity);
+            }
         }
         else {
             player.method_486(blockEntity);
         }
         return true;
+    }
+
+    @Override
+    public void onBlockBreakStart(World world, int x, int y, int z, PlayerEntity player) {
+        if(world.getBlockState(x, y, z).get(PROTECTED).booleanValue() && hitChestLock(world, x, y, z, player)){
+            world.setBlockState(x, y, z, world.getBlockState(x, y, z).with(PROTECTED, false));
+            world.method_246(x, y, z);
+            ejectDiamond(world, x, y, z);
+        }
+    }
+
+    private boolean hitChestLock(World world, int x, int y, int z, PlayerEntity player){
+        double pitch = player.pitch;
+        double yaw = player.yaw;
+        double distance = 18.0d;
+
+        double pitchRadians = Math.toRadians(pitch);
+        double yawRadians = Math.toRadians(yaw);
+
+        double normalX = -Math.sin(yawRadians) * Math.cos(pitchRadians);
+        double normalY = -Math.sin(pitchRadians);
+        double normalZ = Math.cos(yawRadians) * Math.cos(pitchRadians);
+
+        normalX *= distance;
+        normalY *= distance;
+        normalZ *= distance;
+
+        double targetX = player.x + normalX;
+        double targetY = player.y + normalY;
+        double targetZ = player.z + normalZ;
+        Vec3d playerPos = Vec3d.create(player.x, player.y, player.z);
+
+        Vec3d targetPos = Vec3d.create(targetX, targetY, targetZ);
+        HitResult hitResult = world.method_162(playerPos, targetPos, true, true);
+        System.out.println(hitResult.pos);
+        Direction facing = world.getBlockState(x, y, z).get(FACING);
+        double hitPixelX = (hitResult.pos.x - x) / 10 * 16;
+        double hitPixelY = (hitResult.pos.y - y) / 10 * 16;
+        double hitPixelZ = (hitResult.pos.z - z) / 10 * 16;
+        System.out.println(hitPixelX + ":" + hitPixelY + ":" + hitPixelZ);
+        if(hitPixelY > 0.9 && hitPixelY < 1.3){
+            if(hitResult.pos.z == (double)z){
+                // North
+                if(facing == Direction.NORTH){
+                    if(hitPixelX > 0.7 && hitPixelX < 0.9){
+                        return true;
+                    }
+                }
+            }
+            if(hitResult.pos.x == (double)x + 1){
+                // East
+                if(facing == Direction.EAST){
+                    if(hitPixelZ > 0.7 && hitPixelZ < 0.9){
+                        return true;
+                    }
+                }
+            }
+            if(hitResult.pos.z == (double)z + 1){
+                // South
+                if(facing == Direction.SOUTH){
+                    if(hitPixelX > 0.7 && hitPixelX < 0.9){
+                        return true;
+                    }
+                }
+            }
+            if(hitResult.pos.x == (double)x){
+                // West
+                if(facing == Direction.WEST){
+                    if(hitPixelZ > 0.7 && hitPixelZ < 0.9){
+                        return true;
+                    }
+                }
+            }
+            if(hitResult.pos.y == (double)y + 1){
+                // Top
+            }
+            if(hitResult.pos.y == (double)y){
+                // Bottom
+            }
+        }
+        return false;
     }
 
     @Override
@@ -108,5 +211,36 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
                 }
             }
         }
+    }
+
+    private void ejectDiamond(World world, int x, int y, int z){
+        Direction facing = world.getBlockState(x, y, z).get(FACING);
+        byte var9 = 0;
+        byte var10 = 0;
+        if (facing == Direction.NORTH) {
+            var10 = 1;
+        } else if (facing == Direction.EAST) {
+            var10 = -1;
+        } else if (facing == Direction.SOUTH) {
+            var9 = 1;
+        } else if(facing == Direction.WEST){
+            var9 = -1;
+        }
+
+        ItemStack diamondStack = new ItemStack(Item.DIAMOND);
+        diamondStack.count = 1;
+        double var13 = (double)x + (double)var9 * 0.6 + 0.5;
+        double var15 = (double)y + 0.5;
+        double var17 = (double)z + (double)var10 * 0.6 + 0.5;
+
+        ItemEntity var24 = new ItemEntity(world, var13, var15 - 0.3, var17, diamondStack);
+        double var20 = random.nextDouble() * 0.1 + 0.2;
+        var24.velocityX = (double)var9 * var20;
+        var24.velocityY = 0.20000000298023224;
+        var24.velocityZ = (double)var10 * var20;
+        var24.velocityX += random.nextGaussian() * 0.007499999832361937 * 6.0;
+        var24.velocityY += random.nextGaussian() * 0.007499999832361937 * 6.0;
+        var24.velocityZ += random.nextGaussian() * 0.007499999832361937 * 6.0;
+        world.method_210(var24);
     }
 }

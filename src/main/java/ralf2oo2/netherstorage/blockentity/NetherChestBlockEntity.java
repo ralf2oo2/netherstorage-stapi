@@ -126,7 +126,7 @@ public class NetherChestBlockEntity extends BlockEntity implements Inventory {
     @Override
     public String getName() {
         if(StorageManager.netherLabels.containsKey(getKey())){
-            return StorageManager.netherLabels.get("");
+            return StorageManager.netherLabels.get(getKey());
         }
         return "Nether Chest";
     }
