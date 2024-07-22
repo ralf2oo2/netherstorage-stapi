@@ -72,25 +72,28 @@ public class NetherChestBlockEntityRenderer extends BlockEntityRenderer {
     public void render(BlockEntity blockEntity, double x, double y, double z, float f) {
 
         GL11.glPushMatrix();
+        GL11.glDisable(GL11.GL_LIGHTING);
         NetherChestBlockEntity netherChestBlockEntity = (NetherChestBlockEntity) blockEntity;
-        Direction facing = NetherStorageClient.getMc().world.getBlockState(netherChestBlockEntity.x, netherChestBlockEntity.y, netherChestBlockEntity.z).get(FACING);
+        Direction facing = dispatcher.field_1557.getBlockState(netherChestBlockEntity.x, netherChestBlockEntity.y, netherChestBlockEntity.z).get(FACING);
+
+        float brightness = dispatcher.field_1557.method_1782(blockEntity.x, blockEntity.y + 1, blockEntity.z);
 
         Block block = BlockRegistry.netherChest;
         bindTexture("assets/netherstorage/textures/block/nether_chest_channel.png");
 
-        setGlColor(getColorFromString(netherChestBlockEntity.color1));
+        setGlColor(getColorFromString(netherChestBlockEntity.color1), brightness);
         renderColorCube(x, y, z, 0, facing);
 
-        setGlColor(getColorFromString(netherChestBlockEntity.color2));
+        setGlColor(getColorFromString(netherChestBlockEntity.color2), brightness);
         renderColorCube(x, y, z, 4, facing);
 
-        setGlColor(getColorFromString(netherChestBlockEntity.color3));
+        setGlColor(getColorFromString(netherChestBlockEntity.color3), brightness);
         renderColorCube(x, y, z, 8, facing);
-
+        GL11.glEnable(GL11.GL_LIGHTING);
         GL11.glPopMatrix();
     }
 
-    public void setGlColor(int color){
+    public void setGlColor(int color, float brightness){
         float var10 = (float)(color >> 16 & 255) / 255.0F;
         float var7 = (float)(color >> 8 & 255) / 255.0F;
         float var8 = (float)(color & 255) / 255.0F;
@@ -99,7 +102,7 @@ public class NetherChestBlockEntityRenderer extends BlockEntityRenderer {
             var9 = 1.0F;
         }
 
-        GL11.glColor4f(var10, var7, var8, var9);
+        GL11.glColor4f(var10 * brightness, var7 * brightness, var8 * brightness, var9);
     }
 
     public void renderColorCube(double x, double y, double z, int pixelOffset, Direction facing){

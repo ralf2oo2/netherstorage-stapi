@@ -24,50 +24,24 @@ public class NetherChestBlockEntity extends BlockEntity implements Inventory {
 
     public String getKey(){
         String key = ownerUUID != "" ? ownerUUID + "&" : "";
-        for(int i = 0; i < channelSlots.length; i++){
-            if(channelSlots[i] != null){
-                key += ItemRegistry.INSTANCE.getId(channelSlots[i].getItem()).toString();
-            }
-            else{
-                key += "empty";
-            }
-            if(i != channelSlots.length - 1){
-                key += "&";
-            }
-        }
+        key += color1 + "&" + color2 + "&" + color3;
         System.out.println(key);
         return key;
     }
     @Override
     public void readNbt(NbtCompound nbt) {
         super.readNbt(nbt);
-        NbtList nbtList = nbt.getList("ChannelItems");
-        this.channelSlots = new ItemStack[channelSlots.length];
-
-        for(int i3 = 0; i3 < nbtList.size(); ++i3) {
-            NbtCompound itemNbt = (NbtCompound)nbtList.get(i3);
-            int i5 = itemNbt.getByte("Slot") & 255;
-            if(i5 >= 0 && i5 < this.channelSlots.length) {
-                this.channelSlots[i5] = new ItemStack(itemNbt);
-            }
-        }
+        color1 = nbt.getString("color1");
+        color2 = nbt.getString("color2");
+        color3 = nbt.getString("color3");
     }
 
     @Override
     public void writeNbt(NbtCompound nbt) {
         super.writeNbt(nbt);
-        NbtList nbtList = new NbtList();
-
-        for(int i3 = 0; i3 < this.channelSlots.length; ++i3) {
-            if(this.channelSlots[i3] != null) {
-                NbtCompound itemNbt = new NbtCompound();
-                itemNbt.putByte("Slot", (byte)i3);
-                this.channelSlots[i3].writeNbt(itemNbt);
-                nbtList.add(itemNbt);
-            }
-        }
-
-        nbt.put("ChannelItems", nbtList);
+        nbt.putString("color1", color1);
+        nbt.putString("color2", color2);
+        nbt.putString("color3", color3);
     }
 
     public ItemStack[] getInventory(){
