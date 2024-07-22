@@ -93,6 +93,66 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
                     player.method_486(blockEntity);
                 }
             }
+            else if(player.getHand().itemId == Item.DYE.id){
+                int hitColorBlock = getHitColorBlock(world, x, y, z, player);
+                if(hitColorBlock != -1){
+                    System.out.println(hitColorBlock);
+                    switch (player.getHand().getDamage()){
+                        case 0:
+                            setColor(hitColorBlock, "black", world, x, y, z);
+                            break;
+                        case 1:
+                            setColor(hitColorBlock, "red", world, x, y, z);
+                            break;
+                        case 2:
+                            setColor(hitColorBlock, "green", world, x, y, z);
+                            break;
+                        case 3:
+                            setColor(hitColorBlock, "brown", world, x, y, z);
+                            break;
+                        case 4:
+                            setColor(hitColorBlock, "blue", world, x, y, z);
+                            break;
+                        case 5:
+                            setColor(hitColorBlock, "purple", world, x, y, z);
+                            break;
+                        case 6:
+                            setColor(hitColorBlock, "cyan", world, x, y, z);
+                            break;
+                        case 7:
+                            setColor(hitColorBlock, "light_gray", world, x, y, z);
+                            break;
+                        case 8:
+                            setColor(hitColorBlock, "gray", world, x, y, z);
+                            break;
+                        case 9:
+                            setColor(hitColorBlock, "pink", world, x, y, z);
+                            break;
+                        case 10:
+                            setColor(hitColorBlock, "lime", world, x, y, z);
+                            break;
+                        case 11:
+                            setColor(hitColorBlock, "yellow", world, x, y, z);
+                            break;
+                        case 12:
+                            setColor(hitColorBlock, "light_blue", world, x, y, z);
+                            break;
+                        case 13:
+                            setColor(hitColorBlock, "magenta", world, x, y, z);
+                            break;
+                        case 14:
+                            setColor(hitColorBlock, "orange", world, x, y, z);
+                            break;
+                        case 15:
+                            setColor(hitColorBlock, "white", world, x, y, z);
+                            break;
+                    }
+                    world.method_246(x, y, z);
+                }
+                else{
+                    player.method_486(blockEntity);
+                }
+            }
             else {
                 player.method_486(blockEntity);
             }
@@ -101,6 +161,22 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
             player.method_486(blockEntity);
         }
         return true;
+    }
+
+    private void setColor(int blockNumber, String color, World world, int x, int y, int z){
+        NetherChestBlockEntity blockEntity = (NetherChestBlockEntity) world.getBlockEntity(x, y, z);
+        switch (blockNumber){
+            case 1:
+                blockEntity.color1 = color;
+                break;
+            case 2:
+                blockEntity.color2 = color;
+                break;
+            case 3:
+                blockEntity.color3 = color;
+                break;
+        }
+        blockEntity.markDirty();
     }
 
     @Override
@@ -182,6 +258,91 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
             }
         }
         return false;
+    }
+
+    private int getHitColorBlock(World world, int x, int y, int z, PlayerEntity player){
+        int hitColorBlock = -1;
+
+        double pitch = player.pitch;
+        double yaw = player.yaw;
+        double distance = 18.0d;
+
+        double pitchRadians = Math.toRadians(pitch);
+        double yawRadians = Math.toRadians(yaw);
+
+        double normalX = -Math.sin(yawRadians) * Math.cos(pitchRadians);
+        double normalY = -Math.sin(pitchRadians);
+        double normalZ = Math.cos(yawRadians) * Math.cos(pitchRadians);
+
+        normalX *= distance;
+        normalY *= distance;
+        normalZ *= distance;
+
+        double targetX = player.x + normalX;
+        double targetY = player.y + normalY;
+        double targetZ = player.z + normalZ;
+        Vec3d playerPos = Vec3d.create(player.x, player.y, player.z);
+
+        Vec3d targetPos = Vec3d.create(targetX, targetY, targetZ);
+        HitResult hitResult = world.method_162(playerPos, targetPos, true, true);
+        System.out.println(hitResult.pos);
+        Direction facing = world.getBlockState(x, y, z).get(FACING);
+        double hitPixelX = (hitResult.pos.x - x) / 10 * 16;
+        double hitPixelY = (hitResult.pos.y - y) / 10 * 16;
+        double hitPixelZ = (hitResult.pos.z - z) / 10 * 16;
+        System.out.println(hitPixelX + ":" + hitPixelY + ":" + hitPixelZ);
+        if(hitResult.pos.y == (double)y + 1){
+            if(facing == Direction.NORTH || facing == Direction.SOUTH){
+                if(hitPixelZ > 0.6f && hitPixelZ < 1f){
+                    System.out.println(true);
+                    if(hitPixelX > 0.3f && hitPixelX < 0.5f){
+                        if(facing == Direction.NORTH){
+                            hitColorBlock = 3;
+                        }
+                        else{
+                            hitColorBlock = 1;
+                        }
+                    }
+                    if(hitPixelX > 0.7f && hitPixelX < 0.9f){
+                        hitColorBlock = 2;
+                    }
+                    if(hitPixelX > 1.1f && hitPixelX < 1.3f){
+                        if(facing == Direction.NORTH){
+                            hitColorBlock = 1;
+                        }
+                        else{
+                            hitColorBlock = 3;
+                        }
+                    }
+                }
+            }
+            if(facing == Direction.EAST || facing == Direction.WEST){
+                if(hitPixelX > 0.6f && hitPixelX < 1f){
+                    System.out.println(true);
+                    if(hitPixelZ > 0.3f && hitPixelZ < 0.5f){
+                        if(facing == Direction.EAST){
+                            hitColorBlock = 3;
+                        }
+                        else{
+                            hitColorBlock = 1;
+                        }
+                    }
+                    if(hitPixelZ > 0.7f && hitPixelZ < 0.9f){
+                        hitColorBlock = 2;
+                    }
+                    if(hitPixelZ > 1.1f && hitPixelZ < 1.3f){
+                        if(facing == Direction.EAST){
+                            hitColorBlock = 1;
+                        }
+                        else{
+                            hitColorBlock = 3;
+                        }
+                    }
+                }
+            }
+        }
+
+        return hitColorBlock;
     }
 
     @Override
