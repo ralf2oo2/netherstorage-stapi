@@ -5,19 +5,14 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtList;
-import net.modificationstation.stationapi.api.registry.ItemRegistry;
 import ralf2oo2.netherstorage.StorageManager;
-import ralf2oo2.netherstorage.inventory.ChannelInventory;
 
 public class NetherChestBlockEntity extends BlockEntity implements Inventory {
-    public ItemStack[] channelSlots = new ItemStack[3];
-    public ChannelInventory channelInventory;
+    // TODO: replace color strings with array to simplify code
     public String color1 = "white";
     public String color2 = "white";
     public String color3 = "white";
     public String ownerUUID = "";
-    private boolean attemptedLoad = false;
 
     public NetherChestBlockEntity(){
     }
@@ -34,7 +29,6 @@ public class NetherChestBlockEntity extends BlockEntity implements Inventory {
         color1 = nbt.getString("color1");
         color2 = nbt.getString("color2");
         color3 = nbt.getString("color3");
-        attemptedLoad = true;
     }
 
     @Override

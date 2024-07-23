@@ -3,13 +3,9 @@ package ralf2oo2.netherstorage.block;
 import net.minecraft.block.Block;
 import net.minecraft.block.Material;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.DispenserBlockEntity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.ArrowEntity;
-import net.minecraft.entity.projectile.thrown.EggEntity;
-import net.minecraft.entity.projectile.thrown.SnowballEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.hit.HitResult;
@@ -23,11 +19,8 @@ import net.modificationstation.stationapi.api.state.property.EnumProperty;
 import net.modificationstation.stationapi.api.template.block.TemplateBlockWithEntity;
 import net.modificationstation.stationapi.api.util.Identifier;
 import net.modificationstation.stationapi.api.util.math.Direction;
-import ralf2oo2.netherstorage.NetherStorage;
 import ralf2oo2.netherstorage.NetherStorageClient;
 import ralf2oo2.netherstorage.blockentity.NetherChestBlockEntity;
-import ralf2oo2.netherstorage.client.gui.ChannelScreen;
-import ralf2oo2.netherstorage.inventory.ChannelInventory;
 import ralf2oo2.netherstorage.registry.ItemRegistry;
 
 import java.util.Random;
@@ -77,10 +70,7 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
     public boolean onUse(World world, int x, int y, int z, PlayerEntity player) {
         NetherChestBlockEntity blockEntity = (NetherChestBlockEntity) world.getBlockEntity(x, y, z);
         if(player.getHand() != null && !world.isRemote){
-            if(player.getHand().itemId == ItemRegistry.netherChannelEditorItem.id){
-                NetherStorageClient.showChannelScreen(player.inventory, blockEntity);
-            }
-            else if(player.getHand().itemId == ItemRegistry.netherLabelItem.id){
+            if(player.getHand().itemId == ItemRegistry.netherLabelItem.id){
                 NetherStorageClient.showLabelScreen(blockEntity.getKey());
             }
             else if(player.getHand().itemId == Item.DIAMOND.id && !world.getBlockState(x, y, z).get(PROTECTED).booleanValue()){
@@ -99,57 +89,15 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
                 int hitColorBlock = getHitColorBlock(world, x, y, z, player);
                 if(hitColorBlock != -1){
                     System.out.println(hitColorBlock);
-                    switch (player.getHand().getDamage()){
-                        case 0:
-                            setColor(hitColorBlock, "black", world, x, y, z);
-                            break;
-                        case 1:
-                            setColor(hitColorBlock, "red", world, x, y, z);
-                            break;
-                        case 2:
-                            setColor(hitColorBlock, "green", world, x, y, z);
-                            break;
-                        case 3:
-                            setColor(hitColorBlock, "brown", world, x, y, z);
-                            break;
-                        case 4:
-                            setColor(hitColorBlock, "blue", world, x, y, z);
-                            break;
-                        case 5:
-                            setColor(hitColorBlock, "purple", world, x, y, z);
-                            break;
-                        case 6:
-                            setColor(hitColorBlock, "cyan", world, x, y, z);
-                            break;
-                        case 7:
-                            setColor(hitColorBlock, "light_gray", world, x, y, z);
-                            break;
-                        case 8:
-                            setColor(hitColorBlock, "gray", world, x, y, z);
-                            break;
-                        case 9:
-                            setColor(hitColorBlock, "pink", world, x, y, z);
-                            break;
-                        case 10:
-                            setColor(hitColorBlock, "lime", world, x, y, z);
-                            break;
-                        case 11:
-                            setColor(hitColorBlock, "yellow", world, x, y, z);
-                            break;
-                        case 12:
-                            setColor(hitColorBlock, "light_blue", world, x, y, z);
-                            break;
-                        case 13:
-                            setColor(hitColorBlock, "magenta", world, x, y, z);
-                            break;
-                        case 14:
-                            setColor(hitColorBlock, "orange", world, x, y, z);
-                            break;
-                        case 15:
-                            setColor(hitColorBlock, "white", world, x, y, z);
-                            break;
+                    String color = getDyeColorString(player.getHand().getDamage());
+                    if(!isColorEqual(blockEntity, hitColorBlock, color)){
+                        setColor(hitColorBlock, color, world, x, y, z);
+                        world.method_246(x, y, z);
+                        player.getHand().count--;
                     }
-                    world.method_246(x, y, z);
+                    else {
+                        player.method_486(blockEntity);
+                    }
                 }
                 else{
                     player.method_486(blockEntity);
@@ -163,6 +111,78 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
             player.method_486(blockEntity);
         }
         return true;
+    }
+
+    private boolean isColorEqual(NetherChestBlockEntity blockEntity, int blockNumber, String color){
+        boolean equal = false;
+        switch (blockNumber){
+            case 1:
+                equal = blockEntity.color1.equals(color);
+                break;
+            case 2:
+                equal = blockEntity.color2.equals(color);
+                break;
+            case 3:
+                equal = blockEntity.color3.equals(color);
+                break;
+        }
+        return equal;
+    }
+
+    // TODO: replace this with array
+    private String getDyeColorString(int damage){
+        String color = "white";
+        switch (damage){
+            case 0:
+                color = "black";
+                break;
+            case 1:
+                color = "red";
+                break;
+            case 2:
+                color = "green";
+                break;
+            case 3:
+                color = "brown";
+                break;
+            case 4:
+                color = "blue";
+                break;
+            case 5:
+                color = "purple";
+                break;
+            case 6:
+                color = "cyan";
+                break;
+            case 7:
+                color = "light_gray";
+                break;
+            case 8:
+                color = "gray";
+                break;
+            case 9:
+                color = "pink";
+                break;
+            case 10:
+                color = "lime";
+                break;
+            case 11:
+                color = "yellow";
+                break;
+            case 12:
+                color = "light_blue";
+                break;
+            case 13:
+                color = "magenta";
+                break;
+            case 14:
+                color = "orange";
+                break;
+            case 15:
+                color = "white";
+                break;
+        }
+        return color;
     }
 
     private void setColor(int blockNumber, String color, World world, int x, int y, int z){
@@ -353,11 +373,11 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
         Direction facing = world.getBlockState(x, y, z).get(FACING);
         byte var9 = 0;
         byte var10 = 0;
-        if (facing == Direction.NORTH) {
+        if (facing == Direction.SOUTH) {
             var10 = 1;
-        } else if (facing == Direction.EAST) {
+        } else if (facing == Direction.NORTH) {
             var10 = -1;
-        } else if (facing == Direction.SOUTH) {
+        } else if (facing == Direction.EAST) {
             var9 = 1;
         } else if(facing == Direction.WEST){
             var9 = -1;
