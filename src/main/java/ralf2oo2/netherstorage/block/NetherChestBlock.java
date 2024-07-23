@@ -86,6 +86,8 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
             else if(player.getHand().itemId == Item.DIAMOND.id && !world.getBlockState(x, y, z).get(PROTECTED).booleanValue()){
                 if(hitChestLock(world, x, y, z, player)){
                     world.setBlockState(x, y, z, world.getBlockState(x, y, z).with(PROTECTED, true));
+                    blockEntity.cancelRemoval();
+                    world.method_157(x, y, z, blockEntity);
                     world.method_246(x, y, z);
                     player.getHand().count--;
                 }
@@ -182,7 +184,10 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
     @Override
     public void onBlockBreakStart(World world, int x, int y, int z, PlayerEntity player) {
         if(world.getBlockState(x, y, z).get(PROTECTED).booleanValue() && hitChestLock(world, x, y, z, player)){
+            NetherChestBlockEntity blockEntity = (NetherChestBlockEntity) world.getBlockEntity(x, y, z);
             world.setBlockState(x, y, z, world.getBlockState(x, y, z).with(PROTECTED, false));
+            blockEntity.cancelRemoval();
+            world.method_157(x, y, z, blockEntity);
             world.method_246(x, y, z);
             ejectDiamond(world, x, y, z);
         }
@@ -344,36 +349,6 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
 
         return hitColorBlock;
     }
-
-    @Override
-    public void onBreak(World world, int x, int y, int z) {
-        ChannelInventory channelInventory = ((NetherChestBlockEntity)world.getBlockEntity(x, y, z)).channelInventory;
-
-        for(int l = 0; l < channelInventory.size(); ++l) {
-            ItemStack itemstack = channelInventory.getStack(l);
-            if (itemstack != null) {
-                float f = this.random.nextFloat() * 0.8F + 0.1F;
-                float f1 = this.random.nextFloat() * 0.8F + 0.1F;
-                float f2 = this.random.nextFloat() * 0.8F + 0.1F;
-
-                while (itemstack.count > 0) {
-                    int i1 = this.random.nextInt(21) + 10;
-                    if (i1 > itemstack.count) {
-                        i1 = itemstack.count;
-                    }
-
-                    itemstack.count -= i1;
-                    ItemEntity itemEntity = new ItemEntity(world, ((float) x + f), ((float) y + f1), ((float) z + f2), new ItemStack(itemstack.itemId, i1, itemstack.getDamage()));
-                    float f3 = 0.05F;
-                    itemEntity.velocityX = ((float) this.random.nextGaussian() * f3);
-                    itemEntity.velocityY = ((float) this.random.nextGaussian() * f3 + 0.2F);
-                    itemEntity.velocityZ = ((float) this.random.nextGaussian() * f3);
-                    world.method_210(itemEntity);
-                }
-            }
-        }
-    }
-
     private void ejectDiamond(World world, int x, int y, int z){
         Direction facing = world.getBlockState(x, y, z).get(FACING);
         byte var9 = 0;

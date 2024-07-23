@@ -17,9 +17,9 @@ public class NetherChestBlockEntity extends BlockEntity implements Inventory {
     public String color2 = "white";
     public String color3 = "white";
     public String ownerUUID = "";
+    private boolean attemptedLoad = false;
 
     public NetherChestBlockEntity(){
-        channelInventory = new ChannelInventory(this);
     }
 
     public String getKey(){
@@ -34,6 +34,7 @@ public class NetherChestBlockEntity extends BlockEntity implements Inventory {
         color1 = nbt.getString("color1");
         color2 = nbt.getString("color2");
         color3 = nbt.getString("color3");
+        attemptedLoad = true;
     }
 
     @Override
@@ -121,7 +122,6 @@ public class NetherChestBlockEntity extends BlockEntity implements Inventory {
             return true;
         }
     }
-
     @Override
     public void markDirty() {
         StorageManager.saveStorage(world);
