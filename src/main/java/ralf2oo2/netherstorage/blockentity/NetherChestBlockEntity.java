@@ -5,20 +5,23 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.world.PersistentState;
+import ralf2oo2.netherstorage.NetherStorage;
 import ralf2oo2.netherstorage.StorageManager;
+import ralf2oo2.netherstorage.state.NetherChestState;
 
 public class NetherChestBlockEntity extends BlockEntity implements Inventory {
     // TODO: replace color strings with array to simplify code
     public String color1 = "white";
     public String color2 = "white";
     public String color3 = "white";
-    public String ownerUUID = "";
+    public String playerName = "";
 
     public NetherChestBlockEntity(){
     }
 
     public String getKey(){
-        String key = ownerUUID != "" ? ownerUUID + "&" : "";
+        String key = playerName != "" ? playerName + "&" : "";
         key += color1 + "&" + color2 + "&" + color3;
         System.out.println(key);
         return key;
@@ -29,6 +32,16 @@ public class NetherChestBlockEntity extends BlockEntity implements Inventory {
         color1 = nbt.getString("color1");
         color2 = nbt.getString("color2");
         color3 = nbt.getString("color3");
+        playerName = nbt.getString("player_name");
+    }
+
+    private NetherChestState getOrCreateState(String id){
+        NetherChestState state = (NetherChestState) world.persistentStateManager.getOrCreate(NetherChestState.class, id);
+        if(state == null){
+            state = new NetherChestState(id);
+            world.persistentStateManager.set(id, state);
+        }
+        return state;
     }
 
     @Override
@@ -37,10 +50,15 @@ public class NetherChestBlockEntity extends BlockEntity implements Inventory {
         nbt.putString("color1", color1);
         nbt.putString("color2", color2);
         nbt.putString("color3", color3);
+        nbt.putString("player_name", playerName);
     }
 
     public ItemStack[] getInventory(){
-        return StorageManager.getNetherInventory(getKey());
+        NetherChestState state = getOrCreateState(NetherStorage.getStateId() + getKey());
+        if(state == null){
+            return null;
+        }
+        return state.inventory;
     }
 
     @Override
@@ -96,10 +114,16 @@ public class NetherChestBlockEntity extends BlockEntity implements Inventory {
 
     @Override
     public String getName() {
-        if(StorageManager.netherLabels.containsKey(getKey())){
-            return StorageManager.netherLabels.get(getKey());
-        }
-        return "Nether Chest";
+        NetherChestState state = getOrCreateState(NetherStorage.getStateId() + getKey());
+        if(state == null) return "Nether Chest";
+        return state.label;
+    }
+
+    public void setLabel(String label){
+        NetherChestState state = getOrCreateState(NetherStorage.getStateId() + getKey());
+        if(state == null) return;
+        state.label = label;
+        state.markDirty();
     }
 
     @Override
@@ -109,7 +133,7 @@ public class NetherChestBlockEntity extends BlockEntity implements Inventory {
 
     @Override
     public boolean canPlayerUse(PlayerEntity player) {
-        if(getInventory().length == 1){
+        if(getInventory() == null && getInventory().length == 1){
             return false;
         }
         else {
@@ -118,7 +142,10 @@ public class NetherChestBlockEntity extends BlockEntity implements Inventory {
     }
     @Override
     public void markDirty() {
-        StorageManager.saveStorage(world);
         super.markDirty();
+        PersistentState state = getOrCreateState(NetherStorage.getStateId() + getKey());
+        if(state != null){
+            state.markDirty();
+        }
     }
 }

@@ -75,6 +75,7 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
             }
             else if(player.getHand().itemId == Item.DIAMOND.id && !world.getBlockState(x, y, z).get(PROTECTED).booleanValue()){
                 if(hitChestLock(world, x, y, z, player)){
+                    blockEntity.playerName = player.name;
                     world.setBlockState(x, y, z, world.getBlockState(x, y, z).with(PROTECTED, true));
                     blockEntity.cancelRemoval();
                     world.method_157(x, y, z, blockEntity);
@@ -205,6 +206,7 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
     public void onBlockBreakStart(World world, int x, int y, int z, PlayerEntity player) {
         if(world.getBlockState(x, y, z).get(PROTECTED).booleanValue() && hitChestLock(world, x, y, z, player)){
             NetherChestBlockEntity blockEntity = (NetherChestBlockEntity) world.getBlockEntity(x, y, z);
+            blockEntity.playerName = "";
             world.setBlockState(x, y, z, world.getBlockState(x, y, z).with(PROTECTED, false));
             blockEntity.cancelRemoval();
             world.method_157(x, y, z, blockEntity);
@@ -386,7 +388,7 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
         ItemStack diamondStack = new ItemStack(Item.DIAMOND);
         diamondStack.count = 1;
         double var13 = (double)x + (double)var9 * 0.6 + 0.5;
-        double var15 = (double)y + 0.5;
+        double var15 = (double)y + 0.7;
         double var17 = (double)z + (double)var10 * 0.6 + 0.5;
 
         ItemEntity var24 = new ItemEntity(world, var13, var15 - 0.3, var17, diamondStack);

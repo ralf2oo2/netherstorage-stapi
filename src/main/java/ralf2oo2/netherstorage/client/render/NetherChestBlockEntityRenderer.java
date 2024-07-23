@@ -36,7 +36,7 @@ public class NetherChestBlockEntityRenderer extends BlockEntityRenderer {
                 color = 0x414141;
                 break;
             case "pink":
-                color = 0x98199;
+                color = 0xd98199;
                 break;
             case "lime":
                 color = 0x39ba2e;
