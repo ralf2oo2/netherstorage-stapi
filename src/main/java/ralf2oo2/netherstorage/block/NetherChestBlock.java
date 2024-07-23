@@ -19,6 +19,7 @@ import net.modificationstation.stationapi.api.state.property.EnumProperty;
 import net.modificationstation.stationapi.api.template.block.TemplateBlockWithEntity;
 import net.modificationstation.stationapi.api.util.Identifier;
 import net.modificationstation.stationapi.api.util.math.Direction;
+import ralf2oo2.netherstorage.NetherStorage;
 import ralf2oo2.netherstorage.NetherStorageClient;
 import ralf2oo2.netherstorage.blockentity.NetherChestBlockEntity;
 import ralf2oo2.netherstorage.registry.ItemRegistry;
@@ -71,7 +72,7 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
         NetherChestBlockEntity blockEntity = (NetherChestBlockEntity) world.getBlockEntity(x, y, z);
         if(player.getHand() != null && !world.isRemote){
             if(player.getHand().itemId == ItemRegistry.netherLabelItem.id){
-                NetherStorageClient.showLabelScreen(blockEntity.getKey());
+                NetherStorageClient.showLabelScreen(blockEntity);
             }
             else if(player.getHand().itemId == Item.DIAMOND.id && !world.getBlockState(x, y, z).get(PROTECTED).booleanValue()){
                 if(hitChestLock(world, x, y, z, player)){
@@ -89,10 +90,10 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
             else if(player.getHand().itemId == Item.DYE.id){
                 int hitColorBlock = getHitColorBlock(world, x, y, z, player);
                 if(hitColorBlock != -1){
-                    System.out.println(hitColorBlock);
-                    String color = getDyeColorString(player.getHand().getDamage());
-                    if(!isColorEqual(blockEntity, hitColorBlock, color)){
-                        setColor(hitColorBlock, color, world, x, y, z);
+                    System.out.println(hitColorBlock);;
+                    String color = NetherStorage.DYE_COLORS[player.getHand().getDamage()];
+                    if(!blockEntity.channelColors[hitColorBlock].equals(color)){
+                        blockEntity.setColor(hitColorBlock, color);
                         world.method_246(x, y, z);
                         player.getHand().count--;
                     }
@@ -112,94 +113,6 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
             player.method_486(blockEntity);
         }
         return true;
-    }
-
-    private boolean isColorEqual(NetherChestBlockEntity blockEntity, int blockNumber, String color){
-        boolean equal = false;
-        switch (blockNumber){
-            case 1:
-                equal = blockEntity.color1.equals(color);
-                break;
-            case 2:
-                equal = blockEntity.color2.equals(color);
-                break;
-            case 3:
-                equal = blockEntity.color3.equals(color);
-                break;
-        }
-        return equal;
-    }
-
-    // TODO: replace this with array
-    private String getDyeColorString(int damage){
-        String color = "white";
-        switch (damage){
-            case 0:
-                color = "black";
-                break;
-            case 1:
-                color = "red";
-                break;
-            case 2:
-                color = "green";
-                break;
-            case 3:
-                color = "brown";
-                break;
-            case 4:
-                color = "blue";
-                break;
-            case 5:
-                color = "purple";
-                break;
-            case 6:
-                color = "cyan";
-                break;
-            case 7:
-                color = "light_gray";
-                break;
-            case 8:
-                color = "gray";
-                break;
-            case 9:
-                color = "pink";
-                break;
-            case 10:
-                color = "lime";
-                break;
-            case 11:
-                color = "yellow";
-                break;
-            case 12:
-                color = "light_blue";
-                break;
-            case 13:
-                color = "magenta";
-                break;
-            case 14:
-                color = "orange";
-                break;
-            case 15:
-                color = "white";
-                break;
-        }
-        return color;
-    }
-
-    private void setColor(int blockNumber, String color, World world, int x, int y, int z){
-        NetherChestBlockEntity blockEntity = (NetherChestBlockEntity) world.getBlockEntity(x, y, z);
-        switch (blockNumber){
-            case 1:
-                blockEntity.color1 = color;
-                break;
-            case 2:
-                blockEntity.color2 = color;
-                break;
-            case 3:
-                blockEntity.color3 = color;
-                break;
-        }
-        blockEntity.markDirty();
     }
 
     @Override
@@ -324,21 +237,21 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
                     System.out.println(true);
                     if(hitPixelX > 0.3f && hitPixelX < 0.5f){
                         if(facing == Direction.NORTH){
-                            hitColorBlock = 3;
+                            hitColorBlock = 2;
                         }
                         else{
-                            hitColorBlock = 1;
+                            hitColorBlock = 0;
                         }
                     }
                     if(hitPixelX > 0.7f && hitPixelX < 0.9f){
-                        hitColorBlock = 2;
+                        hitColorBlock = 1;
                     }
                     if(hitPixelX > 1.1f && hitPixelX < 1.3f){
                         if(facing == Direction.NORTH){
-                            hitColorBlock = 1;
+                            hitColorBlock = 0;
                         }
                         else{
-                            hitColorBlock = 3;
+                            hitColorBlock = 2;
                         }
                     }
                 }
@@ -348,21 +261,21 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
                     System.out.println(true);
                     if(hitPixelZ > 0.3f && hitPixelZ < 0.5f){
                         if(facing == Direction.EAST){
-                            hitColorBlock = 3;
+                            hitColorBlock = 2;
                         }
                         else{
-                            hitColorBlock = 1;
+                            hitColorBlock = 0;
                         }
                     }
                     if(hitPixelZ > 0.7f && hitPixelZ < 0.9f){
-                        hitColorBlock = 2;
+                        hitColorBlock = 1;
                     }
                     if(hitPixelZ > 1.1f && hitPixelZ < 1.3f){
                         if(facing == Direction.EAST){
-                            hitColorBlock = 1;
+                            hitColorBlock = 0;
                         }
                         else{
-                            hitColorBlock = 3;
+                            hitColorBlock = 2;
                         }
                     }
                 }

@@ -81,13 +81,13 @@ public class NetherChestBlockEntityRenderer extends BlockEntityRenderer {
         Block block = BlockRegistry.netherChest;
         bindTexture("assets/netherstorage/textures/block/nether_chest_channel.png");
 
-        setGlColor(getColorFromString(netherChestBlockEntity.color1), brightness);
+        setGlColor(getColorFromString(netherChestBlockEntity.channelColors[0]), brightness);
         renderColorCube(x, y, z, 0, facing);
 
-        setGlColor(getColorFromString(netherChestBlockEntity.color2), brightness);
+        setGlColor(getColorFromString(netherChestBlockEntity.channelColors[1]), brightness);
         renderColorCube(x, y, z, 4, facing);
 
-        setGlColor(getColorFromString(netherChestBlockEntity.color3), brightness);
+        setGlColor(getColorFromString(netherChestBlockEntity.channelColors[2]), brightness);
         renderColorCube(x, y, z, 8, facing);
         GL11.glEnable(GL11.GL_LIGHTING);
         GL11.glPopMatrix();

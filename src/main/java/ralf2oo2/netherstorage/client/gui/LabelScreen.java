@@ -6,12 +6,17 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import org.lwjgl.input.Keyboard;
 import ralf2oo2.netherstorage.StorageManager;
+import ralf2oo2.netherstorage.blockentity.NetherChestBlockEntity;
+import ralf2oo2.netherstorage.state.NetherChestState;
 
 public class LabelScreen extends Screen {
     private TextFieldWidget textField;
-    private String channel;
-    public LabelScreen(String channel){
-        this.channel = channel;
+    private NetherChestBlockEntity blockEntity;
+
+    private String originalName;
+    public LabelScreen(NetherChestBlockEntity blockEntity){
+        this.blockEntity = blockEntity;
+        originalName = blockEntity.getName();
     }
 
     @Override
@@ -25,10 +30,19 @@ public class LabelScreen extends Screen {
         this.buttons.clear();
         this.buttons.add(new ButtonWidget(0, this.width / 2 - 100, this.height / 4 + 96 + 12, "Set"));
         this.buttons.add(new ButtonWidget(1, this.width / 2 - 100, this.height / 4 + 120 + 12, "Cancel"));
-        ((ButtonWidget)this.buttons.get(0)).active = false;
         this.textField = new TextFieldWidget(this, this.textRenderer, this.width / 2 - 100, this.height / 4 - 10 + 50 + 18, 200, 20, "");
         this.textField.focused = true;
         this.textField.setMaxLength(27);
+        this.textField.setText(this.blockEntity.getName());
+        ((ButtonWidget)this.buttons.get(0)).active = false;
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        if(originalName.equals(textField.getText())){
+            ((ButtonWidget)this.buttons.get(0)).active = false;
+        }
     }
 
     public void removed() {
@@ -44,7 +58,7 @@ public class LabelScreen extends Screen {
                 if(labelContent.length() > 0)
                 {
                     System.out.println(labelContent);
-                    StorageManager.netherLabels.put(channel, labelContent);
+                    blockEntity.setLabel(labelContent);
                     this.minecraft.setScreen(null);
                 }
             }

@@ -6,7 +6,7 @@ import net.minecraft.nbt.NbtList;
 import net.minecraft.world.PersistentState;
 
 public class NetherChestState extends PersistentState {
-    public String channel;
+    public String channel = "";
     public String label = "Nether Chest";
     public ItemStack[] inventory;
     public NetherChestState(String id) {
@@ -16,6 +16,9 @@ public class NetherChestState extends PersistentState {
 
     @Override
     public void readNbt(NbtCompound nbt) {
+        this.channel = nbt.getString("channel");
+        this.label = nbt.getString("label");
+
         NbtList nbtList = nbt.getList("Items");
         this.inventory = new ItemStack[this.inventory.length];
 
@@ -30,6 +33,9 @@ public class NetherChestState extends PersistentState {
 
     @Override
     public void writeNbt(NbtCompound nbt) {
+        nbt.putString("channel", channel);
+        nbt.putString("label", label);
+
         NbtList nbtList = new NbtList();
 
         for(int var3 = 0; var3 < this.inventory.length; ++var3) {

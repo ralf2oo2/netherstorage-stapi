@@ -7,31 +7,32 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.world.PersistentState;
 import ralf2oo2.netherstorage.NetherStorage;
-import ralf2oo2.netherstorage.StorageManager;
 import ralf2oo2.netherstorage.state.NetherChestState;
 
 public class NetherChestBlockEntity extends BlockEntity implements Inventory {
     // TODO: replace color strings with array to simplify code
-    public String color1 = "white";
-    public String color2 = "white";
-    public String color3 = "white";
+    public String[] channelColors;
     public String playerName = "";
 
     public NetherChestBlockEntity(){
+        channelColors = new String[3];
+        for(int i = 0; i < channelColors.length; i++){
+            channelColors[i] = "white";
+        }
     }
 
-    public String getKey(){
+    public String getChannel(){
         String key = playerName != "" ? playerName + "&" : "";
-        key += color1 + "&" + color2 + "&" + color3;
+        key += channelColors[0] + "&" + channelColors[1] + "&" + channelColors[2];
         System.out.println(key);
         return key;
     }
     @Override
     public void readNbt(NbtCompound nbt) {
         super.readNbt(nbt);
-        color1 = nbt.getString("color1");
-        color2 = nbt.getString("color2");
-        color3 = nbt.getString("color3");
+        channelColors[0] = nbt.getString("color1");
+        channelColors[1] = nbt.getString("color2");
+        channelColors[2] = nbt.getString("color3");
         playerName = nbt.getString("player_name");
     }
 
@@ -39,22 +40,34 @@ public class NetherChestBlockEntity extends BlockEntity implements Inventory {
         NetherChestState state = (NetherChestState) world.persistentStateManager.getOrCreate(NetherChestState.class, id);
         if(state == null){
             state = new NetherChestState(id);
+            state.channel = getChannel();
             world.persistentStateManager.set(id, state);
+            state.markDirty();
         }
         return state;
+    }
+
+    public void setColor(int colorIndex, String color){
+        channelColors[colorIndex] = color;
+        NetherChestState state = (NetherChestState) world.persistentStateManager.getOrCreate(NetherChestState.class, getChannel());
+        if(state != null){
+            state.channel = getChannel();
+            state.markDirty();
+        }
+        markDirty();
     }
 
     @Override
     public void writeNbt(NbtCompound nbt) {
         super.writeNbt(nbt);
-        nbt.putString("color1", color1);
-        nbt.putString("color2", color2);
-        nbt.putString("color3", color3);
+        nbt.putString("color1", channelColors[0]);
+        nbt.putString("color2", channelColors[1]);
+        nbt.putString("color3", channelColors[2]);
         nbt.putString("player_name", playerName);
     }
 
     public ItemStack[] getInventory(){
-        NetherChestState state = getOrCreateState(NetherStorage.getStateId() + getKey());
+        NetherChestState state = getOrCreateState(NetherStorage.getStateId() + getChannel());
         if(state == null){
             return null;
         }
@@ -114,13 +127,13 @@ public class NetherChestBlockEntity extends BlockEntity implements Inventory {
 
     @Override
     public String getName() {
-        NetherChestState state = getOrCreateState(NetherStorage.getStateId() + getKey());
+        NetherChestState state = getOrCreateState(NetherStorage.getStateId() + getChannel());
         if(state == null) return "Nether Chest";
         return state.label;
     }
 
     public void setLabel(String label){
-        NetherChestState state = getOrCreateState(NetherStorage.getStateId() + getKey());
+        NetherChestState state = getOrCreateState(NetherStorage.getStateId() + getChannel());
         if(state == null) return;
         state.label = label;
         state.markDirty();
@@ -143,7 +156,7 @@ public class NetherChestBlockEntity extends BlockEntity implements Inventory {
     @Override
     public void markDirty() {
         super.markDirty();
-        PersistentState state = getOrCreateState(NetherStorage.getStateId() + getKey());
+        PersistentState state = getOrCreateState(NetherStorage.getStateId() + getChannel());
         if(state != null){
             state.markDirty();
         }
