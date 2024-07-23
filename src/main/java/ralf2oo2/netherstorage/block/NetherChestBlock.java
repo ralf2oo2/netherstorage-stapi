@@ -71,7 +71,10 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
     public boolean onUse(World world, int x, int y, int z, PlayerEntity player) {
         NetherChestBlockEntity blockEntity = (NetherChestBlockEntity) world.getBlockEntity(x, y, z);
         if(player.getHand() != null && !world.isRemote){
-            if(player.getHand().itemId == ItemRegistry.netherLabelItem.id){
+            if(shouldIgnoreActions(player.getHand())){
+                return false;
+            }
+            else if(player.getHand().itemId == ItemRegistry.netherLabelItem.id){
                 NetherStorageClient.showLabelScreen(blockEntity);
             }
             else if(player.getHand().itemId == Item.DIAMOND.id && !world.getBlockState(x, y, z).get(PROTECTED).booleanValue()){
@@ -115,6 +118,16 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
         return true;
     }
 
+    private boolean shouldIgnoreActions(ItemStack item){
+        boolean ignoreActions = false;
+
+        if(item.itemId == ItemRegistry.netherChannelEditorItem.id){
+            return true;
+        }
+
+        return ignoreActions;
+    }
+
     @Override
     public void onBlockBreakStart(World world, int x, int y, int z, PlayerEntity player) {
         if(world.getBlockState(x, y, z).get(PROTECTED).booleanValue() && hitChestLock(world, x, y, z, player)){
@@ -126,6 +139,12 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
             world.method_246(x, y, z);
             ejectDiamond(world, x, y, z);
         }
+    }
+
+    // TODO: return diamond when chest broken
+    @Override
+    public void onBreak(World world, int x, int y, int z) {
+        super.onBreak(world, x, y, z);
     }
 
     private boolean hitChestLock(World world, int x, int y, int z, PlayerEntity player){
