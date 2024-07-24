@@ -16,7 +16,7 @@ public class LabelScreen extends Screen {
     private String originalName;
     public LabelScreen(NetherChestBlockEntity blockEntity){
         this.blockEntity = blockEntity;
-        originalName = blockEntity.getName();
+        originalName = blockEntity.getLabel();
     }
 
     @Override
@@ -33,7 +33,7 @@ public class LabelScreen extends Screen {
         this.textField = new TextFieldWidget(this, this.textRenderer, this.width / 2 - 100, this.height / 4 - 10 + 50 + 18, 200, 20, "");
         this.textField.focused = true;
         this.textField.setMaxLength(27);
-        this.textField.setText(this.blockEntity.getName());
+        this.textField.setText(this.blockEntity.getLabel());
         ((ButtonWidget)this.buttons.get(0)).active = false;
     }
 

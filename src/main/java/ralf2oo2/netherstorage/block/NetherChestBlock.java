@@ -8,6 +8,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -22,6 +23,7 @@ import net.modificationstation.stationapi.api.util.math.Direction;
 import ralf2oo2.netherstorage.NetherStorage;
 import ralf2oo2.netherstorage.NetherStorageClient;
 import ralf2oo2.netherstorage.blockentity.NetherChestBlockEntity;
+import ralf2oo2.netherstorage.item.NetherBagItem;
 import ralf2oo2.netherstorage.registry.ItemRegistry;
 
 import java.util.Random;
@@ -74,6 +76,10 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
             if(shouldIgnoreActions(player.getHand())){
                 return false;
             }
+            else if(player.getHand().getItem() instanceof NetherBagItem && player.method_1373()){
+                NbtCompound nbtCompound = player.getHand().getStationNbt();
+                nbtCompound.putString("channel", blockEntity.getChannel());
+            }
             else if(player.getHand().itemId == ItemRegistry.netherLabelItem.id){
                 NetherStorageClient.showLabelScreen(blockEntity);
             }
@@ -87,7 +93,7 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
                     player.getHand().count--;
                 }
                 else {
-                    player.method_486(blockEntity);
+                    player.method_486(blockEntity.getState());
                 }
             }
             else if(player.getHand().itemId == Item.DYE.id){
@@ -101,29 +107,25 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
                         player.getHand().count--;
                     }
                     else {
-                        player.method_486(blockEntity);
+                        player.method_486(blockEntity.getState());
                     }
                 }
                 else{
-                    player.method_486(blockEntity);
+                    player.method_486(blockEntity.getState());
                 }
             }
             else {
-                player.method_486(blockEntity);
+                player.method_486(blockEntity.getState());
             }
         }
         else {
-            player.method_486(blockEntity);
+            player.method_486(blockEntity.getState());
         }
         return true;
     }
 
     private boolean shouldIgnoreActions(ItemStack item){
         boolean ignoreActions = false;
-
-        if(item.itemId == ItemRegistry.netherChannelEditorItem.id){
-            return true;
-        }
 
         return ignoreActions;
     }

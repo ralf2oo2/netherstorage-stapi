@@ -9,8 +9,7 @@ import net.minecraft.world.PersistentState;
 import ralf2oo2.netherstorage.NetherStorage;
 import ralf2oo2.netherstorage.state.NetherChestState;
 
-public class NetherChestBlockEntity extends BlockEntity implements Inventory {
-    // TODO: replace color strings with array to simplify code
+public class NetherChestBlockEntity extends BlockEntity {
     public String[] channelColors;
     public String playerName = "";
 
@@ -22,18 +21,10 @@ public class NetherChestBlockEntity extends BlockEntity implements Inventory {
     }
 
     public String getChannel(){
-        String key = playerName != "" ? playerName + "&" : "";
+        String key = !playerName.equals("") ? playerName + "&" : "";
         key += channelColors[0] + "&" + channelColors[1] + "&" + channelColors[2];
         System.out.println(key);
         return key;
-    }
-    @Override
-    public void readNbt(NbtCompound nbt) {
-        super.readNbt(nbt);
-        channelColors[0] = nbt.getString("color1");
-        channelColors[1] = nbt.getString("color2");
-        channelColors[2] = nbt.getString("color3");
-        playerName = nbt.getString("player_name");
     }
 
     private NetherChestState getOrCreateState(String id){
@@ -45,6 +36,10 @@ public class NetherChestBlockEntity extends BlockEntity implements Inventory {
             state.markDirty();
         }
         return state;
+    }
+
+    public NetherChestState getState(){
+        return getOrCreateState(NetherStorage.getStateId() + getChannel());
     }
 
     public void setColor(int colorIndex, String color){
@@ -66,67 +61,15 @@ public class NetherChestBlockEntity extends BlockEntity implements Inventory {
         nbt.putString("player_name", playerName);
     }
 
-    public ItemStack[] getInventory(){
-        NetherChestState state = getOrCreateState(NetherStorage.getStateId() + getChannel());
-        if(state == null){
-            return null;
-        }
-        return state.inventory;
-    }
-
     @Override
-    public int size() {
-        if(getInventory() != null){
-            return 27;
-        }
-        else {
-            return 0;
-        }
+    public void readNbt(NbtCompound nbt) {
+        super.readNbt(nbt);
+        channelColors[0] = nbt.getString("color1");
+        channelColors[1] = nbt.getString("color2");
+        channelColors[2] = nbt.getString("color3");
+        playerName = nbt.getString("player_name");
     }
-
-    @Override
-    public ItemStack getStack(int slot) {
-        ItemStack stack = getInventory()[slot];
-        // TODO: check if this is nescesary
-        /*if(stack != null)
-        {
-            slotpos = i1;
-            count = stack.stackSize;
-        }*/
-        return stack;
-    }
-
-    @Override
-    public ItemStack removeStack(int slot, int amount) {
-        if(getInventory()[slot] != null) {
-            ItemStack itemStack3;
-            if(this.getInventory()[slot].count <= amount) {
-                itemStack3 = this.getInventory()[slot];
-                this.getInventory()[slot] = null;
-                this.markDirty();
-                return itemStack3;
-            } else {
-                itemStack3 = this.getInventory()[slot].split(amount);
-                if(this.getInventory()[slot].count == 0) {
-                    this.getInventory()[slot] = null;
-                }
-
-                this.markDirty();
-                return itemStack3;
-            }
-        } else {
-            return null;
-        }
-    }
-
-    @Override
-    public void setStack(int slot, ItemStack stack) {
-        getInventory()[slot] = stack;
-        markDirty();
-    }
-
-    @Override
-    public String getName() {
+    public String getLabel(){
         NetherChestState state = getOrCreateState(NetherStorage.getStateId() + getChannel());
         if(state == null) return "Nether Chest";
         return state.label;
@@ -137,28 +80,5 @@ public class NetherChestBlockEntity extends BlockEntity implements Inventory {
         if(state == null) return;
         state.label = label;
         state.markDirty();
-    }
-
-    @Override
-    public int getMaxCountPerStack() {
-        return 64;
-    }
-
-    @Override
-    public boolean canPlayerUse(PlayerEntity player) {
-        if(getInventory() == null && getInventory().length == 1){
-            return false;
-        }
-        else {
-            return true;
-        }
-    }
-    @Override
-    public void markDirty() {
-        super.markDirty();
-        PersistentState state = getOrCreateState(NetherStorage.getStateId() + getChannel());
-        if(state != null){
-            state.markDirty();
-        }
     }
 }

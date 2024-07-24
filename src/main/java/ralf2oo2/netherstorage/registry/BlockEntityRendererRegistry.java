@@ -8,7 +8,7 @@ import ralf2oo2.netherstorage.client.render.NetherChestBlockEntityRenderer;
 
 public class BlockEntityRendererRegistry {
     @EventListener
-    private static void registerBlockEntities(BlockEntityRendererRegisterEvent event) {
+    private static void registerBlockEntityRenderers(BlockEntityRendererRegisterEvent event) {
         event.renderers.put(NetherChestBlockEntity.class, new NetherChestBlockEntityRenderer());
     }
 }

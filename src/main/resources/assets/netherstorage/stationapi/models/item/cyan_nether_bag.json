@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "netherstorage:item/cyan_nether_bag"
+  }
+}
