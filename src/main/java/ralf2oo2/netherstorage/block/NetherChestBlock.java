@@ -1,5 +1,8 @@
 package ralf2oo2.netherstorage.block;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.fabricmc.loader.FabricLoader;
 import net.minecraft.block.Block;
 import net.minecraft.block.Material;
 import net.minecraft.block.entity.BlockEntity;
@@ -69,10 +72,12 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
         return new NetherChestBlockEntity();
     }
 
+
+    // TODO: don't raycast on server, do it on client and send packet
     @Override
     public boolean onUse(World world, int x, int y, int z, PlayerEntity player) {
         NetherChestBlockEntity blockEntity = (NetherChestBlockEntity) world.getBlockEntity(x, y, z);
-        if(player.getHand() != null && !world.isRemote){
+        if(player.getHand() != null){
             if(shouldIgnoreActions(player.getHand())){
                 return false;
             }
@@ -81,7 +86,9 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
                 nbtCompound.putString("channel", blockEntity.getChannel());
             }
             else if(player.getHand().itemId == ItemRegistry.netherLabelItem.id){
-                NetherStorageClient.showLabelScreen(blockEntity);
+                if(FabricLoader.INSTANCE.getEnvironmentType() == EnvType.CLIENT){
+                    NetherStorageClient.showLabelScreen(blockEntity);
+                }
             }
             else if(player.getHand().itemId == Item.DIAMOND.id && !world.getBlockState(x, y, z).get(PROTECTED).booleanValue()){
                 if(hitChestLock(world, x, y, z, player)){
@@ -93,7 +100,9 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
                     player.getHand().count--;
                 }
                 else {
-                    player.method_486(blockEntity.getState());
+                    if(FabricLoader.INSTANCE.getEnvironmentType() == EnvType.CLIENT){
+                        player.method_486(blockEntity.getState());
+                    }
                 }
             }
             else if(player.getHand().itemId == Item.DYE.id){
@@ -111,7 +120,9 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
                     }
                 }
                 else{
-                    player.method_486(blockEntity.getState());
+                    if(FabricLoader.INSTANCE.getEnvironmentType() == EnvType.CLIENT){
+                        player.method_486(blockEntity.getState());
+                    }
                 }
             }
             else {

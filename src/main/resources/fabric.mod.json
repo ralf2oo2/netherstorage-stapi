@@ -22,7 +22,8 @@
       "ralf2oo2.netherstorage.NetherStorage",
       "ralf2oo2.netherstorage.registry.BlockRegistry",
       "ralf2oo2.netherstorage.registry.ItemRegistry",
-      "ralf2oo2.netherstorage.registry.BlockEntityRegistry"
+      "ralf2oo2.netherstorage.registry.BlockEntityRegistry",
+      "ralf2oo2.netherstorage.registry.PacketRegistry"
     ],
     "stationapi:event_bus_client": [
       "ralf2oo2.netherstorage.registry.BlockEntityRendererRegistry"

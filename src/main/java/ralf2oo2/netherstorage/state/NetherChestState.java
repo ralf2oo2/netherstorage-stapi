@@ -6,6 +6,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.world.PersistentState;
+import net.minecraft.world.PersistentStateManager;
 import ralf2oo2.netherstorage.NetherStorage;
 
 public class NetherChestState extends PersistentState implements Inventory {
