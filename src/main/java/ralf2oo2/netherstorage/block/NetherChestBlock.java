@@ -17,6 +17,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.modificationstation.stationapi.api.block.BlockState;
+import net.modificationstation.stationapi.api.network.packet.PacketHelper;
 import net.modificationstation.stationapi.api.state.StateManager;
 import net.modificationstation.stationapi.api.state.property.BooleanProperty;
 import net.modificationstation.stationapi.api.state.property.EnumProperty;
@@ -26,8 +27,14 @@ import net.modificationstation.stationapi.api.util.math.Direction;
 import ralf2oo2.netherstorage.NetherStorage;
 import ralf2oo2.netherstorage.NetherStorageClient;
 import ralf2oo2.netherstorage.blockentity.NetherChestBlockEntity;
+import ralf2oo2.netherstorage.client.gui.LabelScreen;
 import ralf2oo2.netherstorage.item.NetherBagItem;
+import ralf2oo2.netherstorage.packet.clientbound.ShowLabelScreenPacket;
+import ralf2oo2.netherstorage.packet.serverbound.SetChannelValuePacket;
+import ralf2oo2.netherstorage.packet.serverbound.SetLabelPacket;
+import ralf2oo2.netherstorage.packet.serverbound.SetProtectedStatePacket;
 import ralf2oo2.netherstorage.registry.ItemRegistry;
+import ralf2oo2.netherstorage.state.NetherChestState;
 
 import java.util.Random;
 
@@ -87,50 +94,63 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
             }
             else if(player.getHand().itemId == ItemRegistry.netherLabelItem.id){
                 if(FabricLoader.INSTANCE.getEnvironmentType() == EnvType.CLIENT){
-                    NetherStorageClient.showLabelScreen(blockEntity);
+                    if(!world.isRemote){
+                        NetherStorageClient.showLabelScreen(blockEntity);
+                    }
+                }
+                else {
+                    // TODO: send packet to open label gui
+                    PacketHelper.sendTo(player, new ShowLabelScreenPacket(blockEntity.getChannel(), blockEntity.getLabel()));
                 }
             }
             else if(player.getHand().itemId == Item.DIAMOND.id && !world.getBlockState(x, y, z).get(PROTECTED).booleanValue()){
+                if(FabricLoader.INSTANCE.getEnvironmentType() == EnvType.SERVER) return true;
                 if(hitChestLock(world, x, y, z, player)){
                     blockEntity.playerName = player.name;
-                    world.setBlockState(x, y, z, world.getBlockState(x, y, z).with(PROTECTED, true));
-                    blockEntity.cancelRemoval();
-                    world.method_157(x, y, z, blockEntity);
-                    world.method_246(x, y, z);
+                    PacketHelper.send(new SetChannelValuePacket(player.name, 0, x, y, z));
+                    PacketHelper.send(new SetProtectedStatePacket(x, y ,z, true));
+                    if(true){
+                        world.setBlockState(x, y, z, world.getBlockState(x, y, z).with(PROTECTED, true));
+                        blockEntity.cancelRemoval();
+                        world.method_157(x, y, z, blockEntity);
+                        world.method_246(x, y, z);
+                    }
                     player.getHand().count--;
                 }
                 else {
                     if(FabricLoader.INSTANCE.getEnvironmentType() == EnvType.CLIENT){
-                        player.method_486(blockEntity.getState());
+                        showChestGui(player, blockEntity.getState(), world);
                     }
                 }
             }
             else if(player.getHand().itemId == Item.DYE.id){
+                if(FabricLoader.INSTANCE.getEnvironmentType() == EnvType.SERVER) return true;
                 int hitColorBlock = getHitColorBlock(world, x, y, z, player);
                 if(hitColorBlock != -1){
                     System.out.println(hitColorBlock);;
                     String color = NetherStorage.DYE_COLORS[player.getHand().getDamage()];
                     if(!blockEntity.channelColors[hitColorBlock].equals(color)){
                         blockEntity.setColor(hitColorBlock, color);
+                        PacketHelper.send(new SetChannelValuePacket(color, hitColorBlock + 1, x, y, z));
                         world.method_246(x, y, z);
                         player.getHand().count--;
                     }
                     else {
-                        player.method_486(blockEntity.getState());
+                        showChestGui(player, blockEntity.getState(), world);
                     }
                 }
                 else{
                     if(FabricLoader.INSTANCE.getEnvironmentType() == EnvType.CLIENT){
-                        player.method_486(blockEntity.getState());
+                        showChestGui(player, blockEntity.getState(), world);
                     }
                 }
             }
             else {
-                player.method_486(blockEntity.getState());
+                showChestGui(player, blockEntity.getState(), world);
             }
         }
         else {
-            player.method_486(blockEntity.getState());
+            showChestGui(player, blockEntity.getState(), world);
         }
         return true;
     }
@@ -141,15 +161,31 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
         return ignoreActions;
     }
 
+    private void showChestGui(PlayerEntity player, NetherChestState state, World world){
+        if(FabricLoader.INSTANCE.getEnvironmentType() == EnvType.CLIENT){
+            if(!world.isRemote){
+                player.method_486(state);
+            }
+        }
+        else {
+            player.method_486(state);
+        }
+    }
+
     @Override
     public void onBlockBreakStart(World world, int x, int y, int z, PlayerEntity player) {
         if(world.getBlockState(x, y, z).get(PROTECTED).booleanValue() && hitChestLock(world, x, y, z, player)){
+            if(FabricLoader.INSTANCE.getEnvironmentType() == EnvType.SERVER) return;
             NetherChestBlockEntity blockEntity = (NetherChestBlockEntity) world.getBlockEntity(x, y, z);
             blockEntity.playerName = "";
-            world.setBlockState(x, y, z, world.getBlockState(x, y, z).with(PROTECTED, false));
-            blockEntity.cancelRemoval();
-            world.method_157(x, y, z, blockEntity);
-            world.method_246(x, y, z);
+            PacketHelper.send(new SetChannelValuePacket("", 0, x, y, z));
+            PacketHelper.send(new SetProtectedStatePacket(x, y ,z, false));
+            if(true){
+                world.setBlockState(x, y, z, world.getBlockState(x, y, z).with(PROTECTED, false));
+                blockEntity.cancelRemoval();
+                world.method_157(x, y, z, blockEntity);
+                world.method_246(x, y, z);
+            }
             ejectDiamond(world, x, y, z);
         }
     }

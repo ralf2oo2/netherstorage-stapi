@@ -1,12 +1,18 @@
 package ralf2oo2.netherstorage.blockentity;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.loader.FabricLoader;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.world.PersistentState;
+import net.modificationstation.stationapi.api.network.packet.PacketHelper;
 import ralf2oo2.netherstorage.NetherStorage;
+import ralf2oo2.netherstorage.block.NetherChestBlock;
+import ralf2oo2.netherstorage.packet.clientbound.SendBlockEntityDataPacket;
+import ralf2oo2.netherstorage.packet.serverbound.RequestBlockEntityDataPacket;
 import ralf2oo2.netherstorage.state.NetherChestState;
 
 public class NetherChestBlockEntity extends BlockEntity {
@@ -52,6 +58,16 @@ public class NetherChestBlockEntity extends BlockEntity {
         }
         markDirty();
     }
+    boolean syncedBlockEntity = false;
+    @Override
+    public void tick() {
+        if(FabricLoader.INSTANCE.getEnvironmentType() == EnvType.CLIENT && world.isRemote){
+            if(!syncedBlockEntity){
+                syncedBlockEntity = true;
+                PacketHelper.send(new RequestBlockEntityDataPacket(x, y ,z));
+            }
+        }
+    }
 
     @Override
     public void writeNbt(NbtCompound nbt) {
@@ -70,6 +86,7 @@ public class NetherChestBlockEntity extends BlockEntity {
         channelColors[2] = nbt.getString("color3");
         playerName = nbt.getString("player_name");
     }
+
     public String getLabel(){
         NetherChestState state = getOrCreateState(NetherStorage.getStateId() + getChannel());
         if(state == null) return "Nether Chest";
@@ -81,5 +98,13 @@ public class NetherChestBlockEntity extends BlockEntity {
         if(state == null) return;
         state.label = label;
         state.markDirty();
+    }
+
+    @Override
+    public void markDirty() {
+        if(FabricLoader.INSTANCE.getEnvironmentType() == EnvType.SERVER){
+            //PacketHelper.send(new SendBlockEntityDataPacket(x, y, z, playerName, channelColors[0], channelColors[1], channelColors[2]));
+        }
+        super.markDirty();
     }
 }

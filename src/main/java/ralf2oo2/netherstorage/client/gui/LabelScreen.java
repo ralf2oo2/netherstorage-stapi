@@ -1,11 +1,15 @@
 package ralf2oo2.netherstorage.client.gui;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.loader.FabricLoader;
 import net.minecraft.client.gui.screen.ConnectScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.world.World;
 import net.modificationstation.stationapi.api.network.packet.PacketHelper;
 import org.lwjgl.input.Keyboard;
+import ralf2oo2.netherstorage.NetherStorageClient;
 import ralf2oo2.netherstorage.StorageManager;
 import ralf2oo2.netherstorage.blockentity.NetherChestBlockEntity;
 import ralf2oo2.netherstorage.packet.serverbound.SetLabelPacket;
@@ -13,12 +17,14 @@ import ralf2oo2.netherstorage.state.NetherChestState;
 
 public class LabelScreen extends Screen {
     private TextFieldWidget textField;
-    private NetherChestBlockEntity blockEntity;
+    private String channel;
+    private String labelContent;
 
     private String originalName;
-    public LabelScreen(NetherChestBlockEntity blockEntity){
-        this.blockEntity = blockEntity;
-        originalName = blockEntity.getLabel();
+    public LabelScreen(String channel, String labelContent){
+        this.channel = channel;
+        this.labelContent = labelContent;
+        originalName = labelContent;
     }
 
     @Override
@@ -35,7 +41,7 @@ public class LabelScreen extends Screen {
         this.textField = new TextFieldWidget(this, this.textRenderer, this.width / 2 - 100, this.height / 4 - 10 + 50 + 18, 200, 20, "");
         this.textField.focused = true;
         this.textField.setMaxLength(27);
-        this.textField.setText(this.blockEntity.getLabel());
+        this.textField.setText(this.labelContent);
         ((ButtonWidget)this.buttons.get(0)).active = false;
     }
 
@@ -59,9 +65,17 @@ public class LabelScreen extends Screen {
                 String labelContent = this.textField.getText().trim();
                 if(labelContent.length() > 0)
                 {
+                    if(!NetherStorageClient.isRemote()){
+                        NetherChestState state = NetherStorageClient.getOrCreateState(channel);
+                        if(state != null){
+                            state.label = labelContent;
+                            state.markDirty();
+                        }
+                    }
+                    else {
+                        PacketHelper.send(new SetLabelPacket(channel, labelContent));
+                    }
                     System.out.println(labelContent);
-                    blockEntity.setLabel(labelContent);
-                    PacketHelper.send(new SetLabelPacket(blockEntity.getChannel(), labelContent));
                     this.minecraft.setScreen(null);
                 }
             }
