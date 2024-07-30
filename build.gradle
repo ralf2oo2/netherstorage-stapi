@@ -18,6 +18,12 @@ loom {
 	customMinecraftManifest.set("https://babric.github.io/manifest-polyfill/${minecraft_version}.json")
 	intermediaryUrl.set("https://maven.glass-launcher.net/babric/babric/intermediary/%1\$s/intermediary-%1\$s-v2.jar")
 }
+loom.runs {
+	register("secondClient") {
+		client()
+		programArgs(["--username", "Player2", "--uuid", "cb7afd42-6488-4bb9-9dd3-151aa66d7049"])
+	}
+}
 
 repositories {
 	// Add repositories to retrieve artifacts from in here.
