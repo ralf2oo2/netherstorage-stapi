@@ -15,6 +15,9 @@ import ralf2oo2.netherstorage.packet.clientbound.SendBlockEntityDataPacket;
 import ralf2oo2.netherstorage.packet.serverbound.RequestBlockEntityDataPacket;
 import ralf2oo2.netherstorage.state.NetherChestState;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class NetherChestBlockEntity extends BlockEntity {
     public String[] channelColors;
     public String playerName = "";
@@ -102,9 +105,32 @@ public class NetherChestBlockEntity extends BlockEntity {
 
     @Override
     public void markDirty() {
-        if(FabricLoader.INSTANCE.getEnvironmentType() == EnvType.SERVER){
-            //PacketHelper.send(new SendBlockEntityDataPacket(x, y, z, playerName, channelColors[0], channelColors[1], channelColors[2]));
-        }
         super.markDirty();
+        if(FabricLoader.INSTANCE.getEnvironmentType() == EnvType.SERVER){
+            PlayerEntity[] players = getPlayerEntitiesInRange(20);
+            if(players != null){
+                for(int i = 0; i < players.length; i++){
+                    PacketHelper.sendTo(players[i], new SendBlockEntityDataPacket(x, y, z, playerName, channelColors[0], channelColors[1], channelColors[2]));
+                }
+            }
+        }
+        System.out.println("marked dirty");
+    }
+
+    private PlayerEntity[] getPlayerEntitiesInRange(double range){
+        List players = new ArrayList<PlayerEntity>();
+        for(int var12 = 0; var12 < world.field_200.size(); ++var12) {
+            PlayerEntity player = (PlayerEntity)world.field_200.get(var12);
+            double distance = player.method_1347(x, y, z);
+
+            System.out.println("distance = " + distance);
+
+            if (distance < range && player.dimensionId == world.dimension.id) {
+                players.add(player);
+            }
+        }
+        PlayerEntity[] playerEntityArray = new PlayerEntity[players.size()];
+        playerEntityArray = (PlayerEntity[]) players.toArray(playerEntityArray);
+        return playerEntityArray;
     }
 }

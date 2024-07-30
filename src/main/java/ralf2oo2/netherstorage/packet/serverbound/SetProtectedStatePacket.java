@@ -1,5 +1,7 @@
 package ralf2oo2.netherstorage.packet.serverbound;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.loader.FabricLoader;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.NetworkHandler;
 import net.minecraft.network.packet.Packet;
@@ -11,7 +13,6 @@ import net.modificationstation.stationapi.api.util.Identifier;
 import ralf2oo2.netherstorage.NetherStorage;
 import ralf2oo2.netherstorage.block.NetherChestBlock;
 import ralf2oo2.netherstorage.blockentity.NetherChestBlockEntity;
-import ralf2oo2.netherstorage.packet.clientbound.UpdateBlockPacket;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -56,19 +57,30 @@ public class SetProtectedStatePacket extends Packet implements IdentifiablePacke
         }
     }
 
+    //TODO: fix blockstate syncing
     @Override
     public void apply(NetworkHandler networkHandler) {
-        PlayerEntity player = PlayerHelper.getPlayerFromPacketHandler(networkHandler);
-        if(player == null) return;
-        World world = player.world;
-        NetherChestBlockEntity blockEntity = (NetherChestBlockEntity) world.getBlockEntity(x, y, z);
-        PacketHelper.send(new SetChannelValuePacket("", 0, x, y, z));
-        world.setBlockState(x, y, z, world.getBlockState(x, y, z).with(NetherChestBlock.PROTECTED, state));
-        blockEntity.cancelRemoval();
-        world.method_157(x, y, z, blockEntity);
-        world.method_246(x, y, z);
+        if(FabricLoader.INSTANCE.getEnvironmentType() == EnvType.CLIENT){
+            PlayerEntity player = PlayerHelper.getPlayerFromPacketHandler(networkHandler);
+            if(player == null || !state) return;
+            World world = player.world;
+            NetherChestBlockEntity blockEntity = (NetherChestBlockEntity) world.getBlockEntity(x, y, z);
+            world.setBlockState(x, y, z, world.getBlockState(x, y, z).with(NetherChestBlock.PROTECTED, state));
+            blockEntity.cancelRemoval();
+            world.method_157(x, y, z, blockEntity);
+            world.method_246(x, y, z);
+        } else if (FabricLoader.INSTANCE.getEnvironmentType() == EnvType.SERVER) {
+            PlayerEntity player = PlayerHelper.getPlayerFromPacketHandler(networkHandler);
+            if(player == null) return;
+            World world = player.world;
+            NetherChestBlockEntity blockEntity = (NetherChestBlockEntity) world.getBlockEntity(x, y, z);
+            world.setBlockState(x, y, z, world.getBlockState(x, y, z).with(NetherChestBlock.PROTECTED, state));
+            blockEntity.cancelRemoval();
+            world.method_157(x, y, z, blockEntity);
+            world.method_246(x, y, z);
 
-        PacketHelper.sendTo(player, new UpdateBlockPacket(x, y, z));
+            PacketHelper.sendTo(player, new SetProtectedStatePacket(x, y, z, state));
+        }
     }
 
     @Override
@@ -82,6 +94,6 @@ public class SetProtectedStatePacket extends Packet implements IdentifiablePacke
     }
 
     public static void register(){
-        IdentifiablePacket.register(ID, false, true, SetProtectedStatePacket::new);
+        IdentifiablePacket.register(ID, true, true, SetProtectedStatePacket::new);
     }
 }

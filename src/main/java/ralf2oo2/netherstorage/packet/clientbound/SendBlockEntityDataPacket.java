@@ -1,5 +1,8 @@
 package ralf2oo2.netherstorage.packet.clientbound;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.fabricmc.loader.FabricLoader;
 import net.minecraft.network.NetworkHandler;
 import net.minecraft.network.packet.Packet;
 import net.modificationstation.stationapi.api.network.packet.IdentifiablePacket;
@@ -62,15 +65,16 @@ public class SendBlockEntityDataPacket extends Packet implements IdentifiablePac
         writeString(color3, stream);
     }
 
-    @Override
     public void apply(NetworkHandler networkHandler) {
-        System.out.println("received");
+        if(FabricLoader.INSTANCE.getEnvironmentType() == EnvType.SERVER)return;
         NetherChestBlockEntity blockEntity = (NetherChestBlockEntity) NetherStorageClient.getMc().player.world.getBlockEntity(x, y, z);
         blockEntity.playerName = playerName;
         blockEntity.channelColors[0] = color1;
         blockEntity.channelColors[1] = color2;
         blockEntity.channelColors[2] = color3;
         blockEntity.markDirty();
+
+        System.out.println("Updated blockentity at X:" + x + " Y:" + y + " Z:" + z);
     }
 
     @Override
