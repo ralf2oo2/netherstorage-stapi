@@ -1,17 +1,11 @@
 package ralf2oo2.netherstorage.client.gui;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.loader.FabricLoader;
-import net.minecraft.client.gui.screen.ConnectScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.world.World;
 import net.modificationstation.stationapi.api.network.packet.PacketHelper;
 import org.lwjgl.input.Keyboard;
 import ralf2oo2.netherstorage.NetherStorageClient;
-import ralf2oo2.netherstorage.StorageManager;
-import ralf2oo2.netherstorage.blockentity.NetherChestBlockEntity;
 import ralf2oo2.netherstorage.packet.serverbound.SetLabelPacket;
 import ralf2oo2.netherstorage.state.NetherChestState;
 

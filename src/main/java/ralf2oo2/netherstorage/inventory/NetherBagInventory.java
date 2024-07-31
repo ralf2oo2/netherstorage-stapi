@@ -7,12 +7,12 @@ import ralf2oo2.netherstorage.blockentity.NetherChestBlockEntity;
 import ralf2oo2.netherstorage.state.NetherChestState;
 
 public class NetherBagInventory implements Inventory {
-    private int itemId;
+    private String channel;
     private PlayerEntity player;
     private NetherChestState state;
 
     public NetherBagInventory(ItemStack itemStack, PlayerEntity player, NetherChestState state){
-        this.itemId = itemStack.itemId;
+        this.channel = itemStack.getStationNbt().getString("channel");
         this.player = player;
         this.state = state;
     }
@@ -54,7 +54,7 @@ public class NetherBagInventory implements Inventory {
 
     @Override
     public boolean canPlayerUse(PlayerEntity player) {
-        if (player.getHand() == null || player.getHand().itemId != itemId) {
+        if (player.getHand() == null || player.getHand().getStationNbt().getString("channel") == null || !player.getHand().getStationNbt().getString("channel").equals(channel)) {
             return false;
         } else {
             return true;

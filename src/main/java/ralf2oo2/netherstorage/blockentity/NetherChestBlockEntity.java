@@ -7,9 +7,11 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.PersistentState;
 import net.modificationstation.stationapi.api.network.packet.PacketHelper;
 import ralf2oo2.netherstorage.NetherStorage;
+import ralf2oo2.netherstorage.NetherStorageClient;
 import ralf2oo2.netherstorage.block.NetherChestBlock;
 import ralf2oo2.netherstorage.packet.clientbound.SendBlockEntityDataPacket;
 import ralf2oo2.netherstorage.packet.serverbound.RequestBlockEntityDataPacket;
@@ -32,7 +34,6 @@ public class NetherChestBlockEntity extends BlockEntity {
     public String getChannel(){
         String key = !playerName.equals("") ? playerName + "&" : "";
         key += channelColors[0] + "&" + channelColors[1] + "&" + channelColors[2];
-        System.out.println(key);
         return key;
     }
 
@@ -67,6 +68,9 @@ public class NetherChestBlockEntity extends BlockEntity {
             if(!syncedBlockEntity){
                 syncedBlockEntity = true;
                 PacketHelper.send(new RequestBlockEntityDataPacket(x, y ,z));
+                if(NetherStorageClient.storedColors.containsKey(new BlockPos(x, y, z))){
+                    NetherStorageClient.storedColors.remove(new BlockPos(x, y, z));
+                }
             }
         }
     }
@@ -113,7 +117,6 @@ public class NetherChestBlockEntity extends BlockEntity {
                 }
             }
         }
-        System.out.println("marked dirty");
     }
 
     private PlayerEntity[] getPlayerEntitiesInRange(double range){
@@ -121,8 +124,6 @@ public class NetherChestBlockEntity extends BlockEntity {
         for(int var12 = 0; var12 < world.field_200.size(); ++var12) {
             PlayerEntity player = (PlayerEntity)world.field_200.get(var12);
             double distance = player.method_1347(x, y, z);
-
-            System.out.println("distance = " + distance);
 
             if (distance < range && player.dimensionId == world.dimension.id) {
                 players.add(player);

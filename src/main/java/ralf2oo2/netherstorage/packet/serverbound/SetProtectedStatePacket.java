@@ -1,7 +1,5 @@
 package ralf2oo2.netherstorage.packet.serverbound;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.loader.FabricLoader;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.network.NetworkHandler;
@@ -14,7 +12,7 @@ import net.modificationstation.stationapi.api.util.Identifier;
 import ralf2oo2.netherstorage.NetherStorage;
 import ralf2oo2.netherstorage.block.NetherChestBlock;
 import ralf2oo2.netherstorage.blockentity.NetherChestBlockEntity;
-import ralf2oo2.netherstorage.packet.clientbound.UpdateBlockPacket;
+import ralf2oo2.netherstorage.packet.clientbound.SendBlockEntityDataPacket;
 import ralf2oo2.netherstorage.registry.BlockRegistry;
 
 import java.io.DataInputStream;
@@ -90,6 +88,7 @@ public class SetProtectedStatePacket extends Packet implements IdentifiablePacke
         if(!state){
             ((NetherChestBlock)BlockRegistry.netherChest).ejectDiamond(world, x, y, z);
         }
+        //PacketHelper.sendTo(player, new SendBlockEntityDataPacket(x ,y ,z, blockEntity.playerName, blockEntity.channelColors[0], blockEntity.channelColors[1], blockEntity.channelColors[2]));
     }
 
     @Override

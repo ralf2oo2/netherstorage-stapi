@@ -13,6 +13,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -58,7 +59,6 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
     @Override
     public void onPlaced(World world, int x, int y, int z, LivingEntity placer) {
         int direction = MathHelper.floor((double)(placer.yaw * 4.0F / 360.0F) + 0.5) & 3;
-        System.out.println(direction);
         switch (direction){
             case 0:
                 world.setBlockState(x, y, z, world.getBlockState(x, y, z).with(FACING, Direction.NORTH));
@@ -90,6 +90,7 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
             else if(player.getHand().getItem() instanceof NetherBagItem && player.method_1373()){
                 NbtCompound nbtCompound = player.getHand().getStationNbt();
                 nbtCompound.putString("channel", blockEntity.getChannel());
+                nbtCompound.putString("label", blockEntity.getLabel());
             }
             else if(player.getHand().itemId == ItemRegistry.netherLabelItem.id){
                 if(FabricLoader.INSTANCE.getEnvironmentType() == EnvType.CLIENT){
@@ -114,6 +115,7 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
                         changingBlockstate = false;
                         player.getHand().count--;
                     } else {
+                        NetherStorageClient.storedColors.put(new BlockPos(x, y, z), blockEntity.channelColors);
                         PacketHelper.send(new SetChannelValuePacket(player.name, 0, x, y, z));
                         PacketHelper.send(new SetProtectedStatePacket(x, y ,z, true));
                     }
@@ -130,7 +132,6 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
                 if(FabricLoader.INSTANCE.getEnvironmentType() == EnvType.SERVER) return true;
                 int hitColorBlock = getHitColorBlock(world, x, y, z, player);
                 if(hitColorBlock != -1){
-                    System.out.println(hitColorBlock);;
                     String color = NetherStorage.DYE_COLORS[player.getHand().getDamage()];
                     if(!blockEntity.channelColors[hitColorBlock].equals(color)){
                         blockEntity.setColor(hitColorBlock, color);
@@ -200,6 +201,7 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
                 changingBlockstate = false;
                 ejectDiamond(world, x, y, z);
             } else {
+                NetherStorageClient.storedColors.put(new BlockPos(x, y, z), blockEntity.channelColors);
                 PacketHelper.send(new SetChannelValuePacket("", 0, x, y, z));
                 PacketHelper.send(new SetProtectedStatePacket(x, y ,z, false));
             }
@@ -248,7 +250,6 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
 
         Vec3d targetPos = Vec3d.create(targetX, targetY, targetZ);
         HitResult hitResult = world.method_162(playerPos, targetPos, true, true);
-        System.out.println(hitResult.pos);
         Direction facing = world.getBlockState(x, y, z).get(FACING);
         double hitPixelX = (hitResult.pos.x - x) / 10 * 16;
         double hitPixelY = (hitResult.pos.y - y) / 10 * 16;
@@ -321,7 +322,6 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
 
         Vec3d targetPos = Vec3d.create(targetX, targetY, targetZ);
         HitResult hitResult = world.method_162(playerPos, targetPos, true, true);
-        System.out.println(hitResult.pos);
         Direction facing = world.getBlockState(x, y, z).get(FACING);
         double hitPixelX = (hitResult.pos.x - x) / 10 * 16;
         double hitPixelY = (hitResult.pos.y - y) / 10 * 16;
@@ -329,7 +329,6 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
         if(hitResult.pos.y == (double)y + 1){
             if(facing == Direction.NORTH || facing == Direction.SOUTH){
                 if(hitPixelZ > 0.6f && hitPixelZ < 1f){
-                    System.out.println(true);
                     if(hitPixelX > 0.3f && hitPixelX < 0.5f){
                         if(facing == Direction.NORTH){
                             hitColorBlock = 2;
@@ -353,7 +352,6 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
             }
             if(facing == Direction.EAST || facing == Direction.WEST){
                 if(hitPixelX > 0.6f && hitPixelX < 1f){
-                    System.out.println(true);
                     if(hitPixelZ > 0.3f && hitPixelZ < 0.5f){
                         if(facing == Direction.EAST){
                             hitColorBlock = 2;

@@ -73,13 +73,11 @@ public class SendBlockEntityDataPacket extends Packet implements IdentifiablePac
         blockEntity.channelColors[1] = color2;
         blockEntity.channelColors[2] = color3;
         blockEntity.markDirty();
-
-        System.out.println("Updated blockentity at X:" + x + " Y:" + y + " Z:" + z);
     }
 
     @Override
     public int size() {
-        return playerName.length() + color1.length() + color2.length() + color3.length();
+        return playerName.length() + color1.length() + color2.length() + color3.length() + 4 * 3;
     }
 
     @Override

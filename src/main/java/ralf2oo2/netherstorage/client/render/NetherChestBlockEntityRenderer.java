@@ -4,6 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
+import net.minecraft.util.math.BlockPos;
 import net.modificationstation.stationapi.api.block.BlockState;
 import net.modificationstation.stationapi.api.util.math.Direction;
 import org.lwjgl.opengl.GL11;
@@ -88,6 +89,9 @@ public class NetherChestBlockEntityRenderer extends BlockEntityRenderer {
 
         Block block = BlockRegistry.netherChest;
         bindTexture("assets/netherstorage/textures/block/nether_chest_channel.png");
+        if(NetherStorageClient.storedColors.containsKey(new BlockPos(blockEntity.x, blockEntity.y, blockEntity.z))){
+            ((NetherChestBlockEntity) blockEntity).channelColors = NetherStorageClient.storedColors.get(new BlockPos(blockEntity.x, blockEntity.y, blockEntity.z));
+        }
 
         setGlColor(getColorFromString(netherChestBlockEntity.channelColors[0]), brightness);
         renderColorCube(x, y, z, 0, facing);

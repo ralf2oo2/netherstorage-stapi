@@ -20,6 +20,8 @@ public class NetherBagItem extends TemplateItem{
         setMaxCount(1);
     }
 
+
+
     @Override
     public ItemStack use(ItemStack stack, World world, PlayerEntity user) {
         if(FabricLoader.INSTANCE.getEnvironmentType() == EnvType.CLIENT && world.isRemote) return stack;
@@ -43,5 +45,16 @@ public class NetherBagItem extends TemplateItem{
             state.markDirty();
         }
         return state;
+    }
+
+    @Override
+    public String getTranslationKey(ItemStack stack) {
+        if(stack == null) return getTranslationKey();
+        NbtCompound nbtCompound = stack.getStationNbt();
+        String label = nbtCompound.getString("label");
+        if(label != null && !label.equals("") && !label.equals("Nether Chest")){
+            return label;
+        }
+        return getTranslationKey();
     }
 }
