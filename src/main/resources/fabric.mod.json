@@ -4,13 +4,12 @@
   "version": "${version}",
 
   "name": "Nether Storage",
-  "description": "This is an example description! Tell everyone what your mod is about!",
+  "description": "NetherStorage is a mod for b1.7.3 that adds Nether chests and bags that work similar to the Ender chests/ pouches from the Ender Storage mod in more recent versions of Minecraft.",
   "authors": [
-    "Me!"
+    "Ralf2oo2"
   ],
   "contact": {
-    "homepage": "https://glass-launcher.net/",
-    "sources": "https://github.com/calmilamsy/stationapi-example-mod"
+    "sources": "https://github.com/ralf2oo2/netherstorage-stapi"
   },
 
   "license": "CC0-1.0",
