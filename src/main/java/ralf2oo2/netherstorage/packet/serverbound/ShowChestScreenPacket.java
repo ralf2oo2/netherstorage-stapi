@@ -1,5 +1,6 @@
 package ralf2oo2.netherstorage.packet.serverbound;
 
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.NetworkHandler;
 import net.minecraft.network.packet.Packet;
@@ -8,32 +9,25 @@ import net.modificationstation.stationapi.api.network.packet.IdentifiablePacket;
 import net.modificationstation.stationapi.api.util.Identifier;
 import ralf2oo2.netherstorage.NetherStorage;
 import ralf2oo2.netherstorage.blockentity.NetherChestBlockEntity;
-import ralf2oo2.netherstorage.state.NetherChestState;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class SetChannelValuePacket extends Packet implements IdentifiablePacket {
-    private String value;
-    private int index;
+public class ShowChestScreenPacket extends Packet implements IdentifiablePacket {
     private int x;
     private int y;
     private int z;
-    public static final Identifier ID = Identifier.of(NetherStorage.NAMESPACE, "set_channel_value");
-    public SetChannelValuePacket(){}
-    public SetChannelValuePacket(String value, int index, int x, int y, int z){
-        this.value = value;
-        this.index = index;
+    public static final Identifier ID = Identifier.of(NetherStorage.NAMESPACE, "show_chest_screen");
+    public ShowChestScreenPacket(){}
+    public ShowChestScreenPacket(int x, int y, int z){
         this.x = x;
         this.y = y;
         this.z = z;
     }
     @Override
     public void read(DataInputStream stream) {
-        this.value = readString(stream, 100);
         try {
-            this.index = stream.readInt();
             this.x = stream.readInt();
             this.y = stream.readInt();
             this.z = stream.readInt();
@@ -44,9 +38,7 @@ public class SetChannelValuePacket extends Packet implements IdentifiablePacket 
 
     @Override
     public void write(DataOutputStream stream) {
-        writeString(value, stream);
         try {
-            stream.writeInt(index);
             stream.writeInt(x);
             stream.writeInt(y);
             stream.writeInt(z);
@@ -59,34 +51,21 @@ public class SetChannelValuePacket extends Packet implements IdentifiablePacket 
     public void apply(NetworkHandler networkHandler) {
         PlayerEntity player = PlayerHelper.getPlayerFromPacketHandler(networkHandler);
         if(player == null) return;
-        NetherChestBlockEntity blockEntity = (NetherChestBlockEntity) player.world.getBlockEntity(x, y, z);
-        switch (index){
-            case 0:
-                blockEntity.playerName = value;
-                break;
-            case 1:
-            case 2:
-            case 3:
-                if(player.getHand() != null){
-                    player.getHand().count--;
-                }
-                blockEntity.channelColors[index - 1] = value;
-                break;
-        }
-        blockEntity.markDirty();
+        BlockEntity blockEntity = player.world.getBlockEntity(x, y, z);
+        if(!(blockEntity instanceof NetherChestBlockEntity)) return;
+        player.method_486(((NetherChestBlockEntity) blockEntity).getState());
     }
 
     @Override
     public int size() {
-        return value.length() + (4 * 4);
+        return 3 * 4;
     }
 
     @Override
     public Identifier getId() {
         return ID;
     }
-
     public static void register(){
-        IdentifiablePacket.register(ID, false, true, SetChannelValuePacket::new);
+        IdentifiablePacket.register(ID, false, true, ShowChestScreenPacket::new);
     }
 }

@@ -1,7 +1,6 @@
 package ralf2oo2.netherstorage.block;
 
 import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.fabricmc.loader.FabricLoader;
 import net.minecraft.block.Block;
 import net.minecraft.block.Material;
@@ -27,12 +26,11 @@ import net.modificationstation.stationapi.api.util.math.Direction;
 import ralf2oo2.netherstorage.NetherStorage;
 import ralf2oo2.netherstorage.NetherStorageClient;
 import ralf2oo2.netherstorage.blockentity.NetherChestBlockEntity;
-import ralf2oo2.netherstorage.client.gui.LabelScreen;
 import ralf2oo2.netherstorage.item.NetherBagItem;
 import ralf2oo2.netherstorage.packet.clientbound.ShowLabelScreenPacket;
 import ralf2oo2.netherstorage.packet.serverbound.SetChannelValuePacket;
-import ralf2oo2.netherstorage.packet.serverbound.SetLabelPacket;
 import ralf2oo2.netherstorage.packet.serverbound.SetProtectedStatePacket;
+import ralf2oo2.netherstorage.packet.serverbound.ShowChestScreenPacket;
 import ralf2oo2.netherstorage.registry.ItemRegistry;
 import ralf2oo2.netherstorage.state.NetherChestState;
 
@@ -40,6 +38,7 @@ import java.util.Random;
 
 public class NetherChestBlock extends TemplateBlockWithEntity {
     private Random random = new Random();
+    public static boolean changingBlockstate = false;
     public static final EnumProperty<Direction> FACING = EnumProperty.of("facing", Direction.class, dir -> dir.getAxis().isHorizontal());
     public static final BooleanProperty PROTECTED = BooleanProperty.of("protected");
     public NetherChestBlock(Identifier identifier, Material material) {
@@ -79,8 +78,6 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
         return new NetherChestBlockEntity();
     }
 
-
-    // TODO: don't raycast on server, do it on client and send packet
     @Override
     public boolean onUse(World world, int x, int y, int z, PlayerEntity player) {
         NetherChestBlockEntity blockEntity = (NetherChestBlockEntity) world.getBlockEntity(x, y, z);
@@ -99,7 +96,6 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
                     }
                 }
                 else {
-                    // TODO: send packet to open label gui
                     PacketHelper.sendTo(player, new ShowLabelScreenPacket(blockEntity.getChannel(), blockEntity.getLabel()));
                 }
             }
@@ -107,19 +103,24 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
                 if(FabricLoader.INSTANCE.getEnvironmentType() == EnvType.SERVER) return true;
                 if(hitChestLock(world, x, y, z, player)){
                     blockEntity.playerName = player.name;
-                    PacketHelper.send(new SetProtectedStatePacket(x, y ,z, true));
-                    PacketHelper.send(new SetChannelValuePacket(player.name, 0, x, y, z));
-                    if(world.isRemote){
+                    if(!world.isRemote){
+                        changingBlockstate = true;
                         world.setBlockState(x, y, z, world.getBlockState(x, y, z).with(PROTECTED, true));
                         blockEntity.cancelRemoval();
                         world.method_157(x, y, z, blockEntity);
                         world.method_246(x, y, z);
+                        changingBlockstate = false;
+                        player.getHand().count--;
+                    } else {
+                        PacketHelper.send(new SetChannelValuePacket(player.name, 0, x, y, z));
+                        PacketHelper.send(new SetProtectedStatePacket(x, y ,z, true));
                     }
-                    player.getHand().count--;
                 }
                 else {
-                    if(FabricLoader.INSTANCE.getEnvironmentType() == EnvType.CLIENT){
-                        showChestGui(player, blockEntity.getState(), world);
+                    if(!world.isRemote){
+                        showChestScreen(player, blockEntity.getState(), world);
+                    } else {
+                        PacketHelper.send(new ShowChestScreenPacket(x, y, z));
                     }
                 }
             }
@@ -131,26 +132,36 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
                     String color = NetherStorage.DYE_COLORS[player.getHand().getDamage()];
                     if(!blockEntity.channelColors[hitColorBlock].equals(color)){
                         blockEntity.setColor(hitColorBlock, color);
-                        PacketHelper.send(new SetChannelValuePacket(color, hitColorBlock + 1, x, y, z));
+                        if(!world.isRemote){
+                            player.getHand().count--;
+                        } else {
+                            PacketHelper.send(new SetChannelValuePacket(color, hitColorBlock + 1, x, y, z));
+                        }
                         world.method_246(x, y, z);
-                        player.getHand().count--;
                     }
                     else {
-                        showChestGui(player, blockEntity.getState(), world);
+                        if(!world.isRemote){
+                            showChestScreen(player, blockEntity.getState(), world);
+                        } else {
+                            PacketHelper.send(new ShowChestScreenPacket(x, y, z));
+                        }
                     }
                 }
                 else{
-                    if(FabricLoader.INSTANCE.getEnvironmentType() == EnvType.CLIENT){
-                        showChestGui(player, blockEntity.getState(), world);
+                    if(!world.isRemote){
+                        showChestScreen(player, blockEntity.getState(), world);
+                    }
+                    else {
+                        PacketHelper.send(new ShowChestScreenPacket(x, y, z));
                     }
                 }
             }
             else {
-                showChestGui(player, blockEntity.getState(), world);
+                showChestScreen(player, blockEntity.getState(), world);
             }
         }
         else {
-            showChestGui(player, blockEntity.getState(), world);
+            showChestScreen(player, blockEntity.getState(), world);
         }
         return true;
     }
@@ -161,7 +172,7 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
         return ignoreActions;
     }
 
-    private void showChestGui(PlayerEntity player, NetherChestState state, World world){
+    private void showChestScreen(PlayerEntity player, NetherChestState state, World world){
         if(FabricLoader.INSTANCE.getEnvironmentType() == EnvType.CLIENT){
             if(!world.isRemote){
                 player.method_486(state);
@@ -178,21 +189,37 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
             if(FabricLoader.INSTANCE.getEnvironmentType() == EnvType.SERVER) return;
             NetherChestBlockEntity blockEntity = (NetherChestBlockEntity) world.getBlockEntity(x, y, z);
             blockEntity.playerName = "";
-            PacketHelper.send(new SetChannelValuePacket("", 0, x, y, z));
-            PacketHelper.send(new SetProtectedStatePacket(x, y ,z, false));
-            if(world.isRemote){
+            if(!world.isRemote){
+                changingBlockstate = true;
                 world.setBlockState(x, y, z, world.getBlockState(x, y, z).with(PROTECTED, false));
                 blockEntity.cancelRemoval();
                 world.method_157(x, y, z, blockEntity);
                 world.method_246(x, y, z);
+                changingBlockstate = false;
+                ejectDiamond(world, x, y, z);
+            } else {
+                PacketHelper.send(new SetChannelValuePacket("", 0, x, y, z));
+                PacketHelper.send(new SetProtectedStatePacket(x, y ,z, false));
             }
-            ejectDiamond(world, x, y, z);
         }
     }
 
-    // TODO: return diamond when chest broken
     @Override
     public void onBreak(World world, int x, int y, int z) {
+        if (!((NetherChestBlockEntity)world.getBlockEntity(x, y, z)).playerName.equals("") && !changingBlockstate) {
+            if(!world.isRemote || FabricLoader.INSTANCE.getEnvironmentType() == EnvType.SERVER){
+                float var8 = this.random.nextFloat() * 0.8F + 0.1F;
+                float var9 = this.random.nextFloat() * 0.8F + 0.1F;
+                float var10 = this.random.nextFloat() * 0.8F + 0.1F;
+
+                ItemEntity var12 = new ItemEntity(world, ((float)x + var8), ((float)y + var9), ((float)z + var10), new ItemStack(Item.DIAMOND));
+                float var13 = 0.05F;
+                var12.velocityX = ((float)this.random.nextGaussian() * var13);
+                var12.velocityY = ((float)this.random.nextGaussian() * var13 + 0.2F);
+                var12.velocityZ = ((float)this.random.nextGaussian() * var13);
+                world.method_210(var12);
+            }
+        }
         super.onBreak(world, x, y, z);
     }
 
@@ -224,7 +251,6 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
         double hitPixelX = (hitResult.pos.x - x) / 10 * 16;
         double hitPixelY = (hitResult.pos.y - y) / 10 * 16;
         double hitPixelZ = (hitResult.pos.z - z) / 10 * 16;
-        System.out.println(hitPixelX + ":" + hitPixelY + ":" + hitPixelZ);
         if(hitPixelY > 0.9 && hitPixelY < 1.3){
             if(hitResult.pos.z == (double)z){
                 // North
@@ -298,7 +324,6 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
         double hitPixelX = (hitResult.pos.x - x) / 10 * 16;
         double hitPixelY = (hitResult.pos.y - y) / 10 * 16;
         double hitPixelZ = (hitResult.pos.z - z) / 10 * 16;
-        System.out.println(hitPixelX + ":" + hitPixelY + ":" + hitPixelZ);
         if(hitResult.pos.y == (double)y + 1){
             if(facing == Direction.NORTH || facing == Direction.SOUTH){
                 if(hitPixelZ > 0.6f && hitPixelZ < 1f){
@@ -352,7 +377,7 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
 
         return hitColorBlock;
     }
-    private void ejectDiamond(World world, int x, int y, int z){
+    public void ejectDiamond(World world, int x, int y, int z){
         Direction facing = world.getBlockState(x, y, z).get(FACING);
         byte var9 = 0;
         byte var10 = 0;

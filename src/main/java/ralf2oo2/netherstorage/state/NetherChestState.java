@@ -8,6 +8,8 @@ import net.minecraft.nbt.NbtList;
 import net.minecraft.world.PersistentState;
 import net.minecraft.world.PersistentStateManager;
 import ralf2oo2.netherstorage.NetherStorage;
+import ralf2oo2.netherstorage.item.NetherBagItem;
+import ralf2oo2.netherstorage.registry.ItemRegistry;
 
 public class NetherChestState extends PersistentState implements Inventory {
     public String channel = "";
@@ -99,6 +101,9 @@ public class NetherChestState extends PersistentState implements Inventory {
 
     @Override
     public void setStack(int slot, ItemStack stack) {
+        if(stack.getItem() != null && stack.getItem() instanceof NetherBagItem){
+            stack.getStationNbt().putString("channel", "");
+        }
         getInventory()[slot] = stack;
         markDirty();
     }

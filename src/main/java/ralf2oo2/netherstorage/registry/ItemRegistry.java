@@ -5,10 +5,12 @@ import net.minecraft.item.Item;
 import net.modificationstation.stationapi.api.event.registry.ItemRegistryEvent;
 import ralf2oo2.netherstorage.NetherStorage;
 import ralf2oo2.netherstorage.item.NetherBagItem;
+import ralf2oo2.netherstorage.item.NetherCoreItem;
 import ralf2oo2.netherstorage.item.NetherLabelItem;
 
 public class ItemRegistry {
     public static Item netherLabelItem;
+    public static Item netherCoreItem;
     public static Item blackNetherBagItem;
     public static Item blueNetherBagItem;
     public static Item brownNetherBagItem;
@@ -28,6 +30,7 @@ public class ItemRegistry {
     @EventListener
     private static void registerItems(ItemRegistryEvent event) {
         netherLabelItem = new NetherLabelItem(NetherStorage.NAMESPACE.id("nether_label")).setTranslationKey(NetherStorage.NAMESPACE, "nether_label");
+        netherCoreItem = new NetherCoreItem(NetherStorage.NAMESPACE.id("nether_core")).setTranslationKey(NetherStorage.NAMESPACE, "nether_core");
 
         blackNetherBagItem = new NetherBagItem(NetherStorage.NAMESPACE.id("black_nether_bag")).setTranslationKey(NetherStorage.NAMESPACE, "black_nether_bag");
         blueNetherBagItem = new NetherBagItem(NetherStorage.NAMESPACE.id("blue_nether_bag")).setTranslationKey(NetherStorage.NAMESPACE, "blue_nether_bag");

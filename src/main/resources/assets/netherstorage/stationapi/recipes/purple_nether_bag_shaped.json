@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "#L#",
+    "LNL",
+    "#B#"
+  ],
+  "key": {
+    "#": {
+      "item": "minecraft:obsidian"
+    },
+    "L": {
+      "item": "minecraft:leather"
+    },
+    "N": {
+      "item": "netherstorage:nether_chest"
+    },
+    "B": {
+      "item": "minecraft:dye",
+      "damage": 5
+    }
+  },
+  "result": {
+    "item": "netherstorage:purple_nether_bag",
+    "count": 1
+  }
+}

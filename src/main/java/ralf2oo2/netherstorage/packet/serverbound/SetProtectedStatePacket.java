@@ -3,6 +3,7 @@ package ralf2oo2.netherstorage.packet.serverbound;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.FabricLoader;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.network.NetworkHandler;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.world.World;
@@ -14,6 +15,7 @@ import ralf2oo2.netherstorage.NetherStorage;
 import ralf2oo2.netherstorage.block.NetherChestBlock;
 import ralf2oo2.netherstorage.blockentity.NetherChestBlockEntity;
 import ralf2oo2.netherstorage.packet.clientbound.UpdateBlockPacket;
+import ralf2oo2.netherstorage.registry.BlockRegistry;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -58,17 +60,36 @@ public class SetProtectedStatePacket extends Packet implements IdentifiablePacke
         }
     }
 
-    //TODO: fix blockstate syncing
+    //TODO: fix blockentity getting reset on client when changing blockstate on server
     @Override
     public void apply(NetworkHandler networkHandler) {
         PlayerEntity player = PlayerHelper.getPlayerFromPacketHandler(networkHandler);
         if(player == null) return;
+        if(state){
+            if(player.getHand() == null || player.getHand().getItem().id != Item.DIAMOND.id){
+                return;
+            }
+            else {
+                player.getHand().count--;
+            }
+        }
+
         World world = player.world;
+
+        if(!state && !world.getBlockState(x, y, z).get(NetherChestBlock.PROTECTED).booleanValue()){
+            return;
+        }
+
         NetherChestBlockEntity blockEntity = (NetherChestBlockEntity) world.getBlockEntity(x, y, z);
+        NetherChestBlock.changingBlockstate = true;
         world.setBlockStateWithNotify(x, y, z, world.getBlockState(x, y, z).with(NetherChestBlock.PROTECTED, state));
         blockEntity.cancelRemoval();
         world.method_157(x, y, z, blockEntity);
         world.method_246(x, y, z);
+        NetherChestBlock.changingBlockstate = false;
+        if(!state){
+            ((NetherChestBlock)BlockRegistry.netherChest).ejectDiamond(world, x, y, z);
+        }
     }
 
     @Override

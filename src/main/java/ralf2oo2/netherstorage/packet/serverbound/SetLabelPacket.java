@@ -49,14 +49,11 @@ public class SetLabelPacket extends Packet implements IdentifiablePacket {
     @Override
     public void apply(NetworkHandler networkHandler) {
         MinecraftServer server = ((MinecraftServer) FabricLoader.getInstance().getGameInstance());
-        System.out.println("guh" + server.field_2841.length);
         for(int i = 0; i < server.field_2841.length; i++){
             NetherChestState state = (NetherChestState) server.field_2841[i].getOrCreateState(NetherChestState.class, NetherStorage.getStateId() + channel);
             if(state != null){
-                System.out.println(state.label + " " + "current label");
                 state.label = labelContent;
                 state.markDirty();
-                System.out.println("changed label");
             }
         }
     }

@@ -8,10 +8,7 @@ import ralf2oo2.netherstorage.client.render.NetherChestBlockEntityRenderer;
 import ralf2oo2.netherstorage.packet.clientbound.SendBlockEntityDataPacket;
 import ralf2oo2.netherstorage.packet.clientbound.ShowLabelScreenPacket;
 import ralf2oo2.netherstorage.packet.clientbound.UpdateBlockPacket;
-import ralf2oo2.netherstorage.packet.serverbound.RequestBlockEntityDataPacket;
-import ralf2oo2.netherstorage.packet.serverbound.SetChannelValuePacket;
-import ralf2oo2.netherstorage.packet.serverbound.SetLabelPacket;
-import ralf2oo2.netherstorage.packet.serverbound.SetProtectedStatePacket;
+import ralf2oo2.netherstorage.packet.serverbound.*;
 
 public class PacketRegistry{
     @EventListener
@@ -22,6 +19,8 @@ public class PacketRegistry{
         RequestBlockEntityDataPacket.register();
         SendBlockEntityDataPacket.register();
         SetProtectedStatePacket.register();
+        // TODO: remove this packet VV
         UpdateBlockPacket.register();
+        ShowChestScreenPacket.register();
     }
 }

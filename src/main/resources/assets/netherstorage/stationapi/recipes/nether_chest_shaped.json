@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "gNg",
+    "NCN",
+    "gLg"
+  ],
+  "key": {
+    "g": {
+      "item": "minecraft:gold_ingot"
+    },
+    "N": {
+      "item": "minecraft:netherrack"
+    },
+    "C": {
+      "item": "minecraft:chest"
+    },
+    "L": {
+      "item": "netherstorage:nether_core"
+    }
+  },
+  "result": {
+    "item": "netherstorage:nether_chest",
+    "count": 1
+  }
+}

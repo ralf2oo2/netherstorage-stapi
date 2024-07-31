@@ -1,5 +1,7 @@
 package ralf2oo2.netherstorage.item;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.loader.FabricLoader;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
@@ -19,9 +21,10 @@ public class NetherBagItem extends TemplateItem{
 
     @Override
     public ItemStack use(ItemStack stack, World world, PlayerEntity user) {
+        if(FabricLoader.INSTANCE.getEnvironmentType() == EnvType.CLIENT && world.isRemote) return stack;
         NbtCompound nbtCompound = stack.getStationNbt();
         String channel = nbtCompound.getString("channel");
-        if(channel != null){
+        if(channel != null && !channel.equals("")){
             NetherChestState state = getState(NetherStorage.getStateId() + channel, world);
             if(state != null){
                 user.method_486(state);

@@ -1,8 +1,19 @@
 {
-  "parent": "minecraft:block/orientable",
+  "parent": "minecraft:block/cube",
+  "display": {
+        "gui": {
+            "rotation": [ 30, 135, 0 ],
+            "translation": [ 0, 0, 0],
+            "scale":[ 0.625, 0.625, 0.625 ]
+        }
+  },	
   "textures": {
-    "top": "netherstorage:block/nether_chest_top",
-    "front": "netherstorage:block/nether_chest_front",
-    "side": "netherstorage:block/nether_chest_side"
+	"particle": "netherstorage:block/nether_chest_front",
+	"down": "netherstorage:block/nether_chest_bottom",
+	"up": "netherstorage:block/nether_chest_top",
+	"north": "netherstorage:block/nether_chest_front",
+	"east": "netherstorage:block/nether_chest_side",
+	"south": "netherstorage:block/nether_chest_side",
+	"west": "netherstorage:block/nether_chest_side"
   }
 }
