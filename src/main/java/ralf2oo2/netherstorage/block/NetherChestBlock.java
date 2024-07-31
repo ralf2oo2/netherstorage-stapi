@@ -8,6 +8,7 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -26,6 +27,7 @@ import net.modificationstation.stationapi.api.util.math.Direction;
 import ralf2oo2.netherstorage.NetherStorage;
 import ralf2oo2.netherstorage.NetherStorageClient;
 import ralf2oo2.netherstorage.blockentity.NetherChestBlockEntity;
+import ralf2oo2.netherstorage.inventory.NetherChestInventory;
 import ralf2oo2.netherstorage.item.NetherBagItem;
 import ralf2oo2.netherstorage.packet.clientbound.ShowLabelScreenPacket;
 import ralf2oo2.netherstorage.packet.serverbound.SetChannelValuePacket;
@@ -118,7 +120,7 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
                 }
                 else {
                     if(!world.isRemote){
-                        showChestScreen(player, blockEntity.getState(), world);
+                        showChestScreen(player,  new NetherChestInventory(blockEntity, blockEntity.getState(), world), world);
                     } else {
                         PacketHelper.send(new ShowChestScreenPacket(x, y, z));
                     }
@@ -141,7 +143,7 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
                     }
                     else {
                         if(!world.isRemote){
-                            showChestScreen(player, blockEntity.getState(), world);
+                            showChestScreen(player,  new NetherChestInventory(blockEntity, blockEntity.getState(), world), world);
                         } else {
                             PacketHelper.send(new ShowChestScreenPacket(x, y, z));
                         }
@@ -149,7 +151,7 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
                 }
                 else{
                     if(!world.isRemote){
-                        showChestScreen(player, blockEntity.getState(), world);
+                        showChestScreen(player,  new NetherChestInventory(blockEntity, blockEntity.getState(), world), world);
                     }
                     else {
                         PacketHelper.send(new ShowChestScreenPacket(x, y, z));
@@ -157,11 +159,11 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
                 }
             }
             else {
-                showChestScreen(player, blockEntity.getState(), world);
+                showChestScreen(player,  new NetherChestInventory(blockEntity, blockEntity.getState(), world), world);
             }
         }
         else {
-            showChestScreen(player, blockEntity.getState(), world);
+            showChestScreen(player,  new NetherChestInventory(blockEntity, blockEntity.getState(), world), world);
         }
         return true;
     }
@@ -172,7 +174,7 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
         return ignoreActions;
     }
 
-    private void showChestScreen(PlayerEntity player, NetherChestState state, World world){
+    private void showChestScreen(PlayerEntity player, Inventory state, World world){
         if(FabricLoader.INSTANCE.getEnvironmentType() == EnvType.CLIENT){
             if(!world.isRemote){
                 player.method_486(state);

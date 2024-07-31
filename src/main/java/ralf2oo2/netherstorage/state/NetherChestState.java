@@ -101,7 +101,7 @@ public class NetherChestState extends PersistentState implements Inventory {
 
     @Override
     public void setStack(int slot, ItemStack stack) {
-        if(stack.getItem() != null && stack.getItem() instanceof NetherBagItem){
+        if(stack != null && stack.getItem() instanceof NetherBagItem){
             stack.getStationNbt().putString("channel", "");
         }
         getInventory()[slot] = stack;

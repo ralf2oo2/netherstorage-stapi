@@ -36,8 +36,7 @@ public class NetherChestBlockEntity extends BlockEntity {
         return key;
     }
 
-    private NetherChestState getOrCreateState(String id){
-        System.out.println("isRemote = "+ world.isRemote);
+    private NetherChestState getOrCreateState(String id){;
         NetherChestState state = (NetherChestState) world.persistentStateManager.getOrCreate(NetherChestState.class, id);
         if(state == null){
             state = new NetherChestState(id);

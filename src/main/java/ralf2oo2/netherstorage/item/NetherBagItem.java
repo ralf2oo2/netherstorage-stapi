@@ -11,6 +11,7 @@ import net.modificationstation.stationapi.api.template.item.TemplateItem;
 import net.modificationstation.stationapi.api.util.Identifier;
 import ralf2oo2.netherstorage.NetherStorage;
 import ralf2oo2.netherstorage.NetherStorageClient;
+import ralf2oo2.netherstorage.inventory.NetherBagInventory;
 import ralf2oo2.netherstorage.state.NetherChestState;
 
 public class NetherBagItem extends TemplateItem{
@@ -25,16 +26,22 @@ public class NetherBagItem extends TemplateItem{
         NbtCompound nbtCompound = stack.getStationNbt();
         String channel = nbtCompound.getString("channel");
         if(channel != null && !channel.equals("")){
-            NetherChestState state = getState(NetherStorage.getStateId() + channel, world);
+            NetherChestState state = getState(NetherStorage.getStateId() + channel, channel, world);
             if(state != null){
-                user.method_486(state);
+                user.method_486(new NetherBagInventory(stack, user, state));
             }
         }
         return stack;
     }
 
-    private NetherChestState getState(String id, World world){
+    private NetherChestState getState(String id, String channel, World world){
         NetherChestState state = (NetherChestState) world.persistentStateManager.getOrCreate(NetherChestState.class, id);
+        if(state == null){
+            state = new NetherChestState(id);
+            state.channel = channel;
+            world.persistentStateManager.set(id, state);
+            state.markDirty();
+        }
         return state;
     }
 }
