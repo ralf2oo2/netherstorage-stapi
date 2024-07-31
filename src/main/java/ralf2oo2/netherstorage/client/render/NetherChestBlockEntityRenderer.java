@@ -4,6 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
+import net.modificationstation.stationapi.api.block.BlockState;
 import net.modificationstation.stationapi.api.util.math.Direction;
 import org.lwjgl.opengl.GL11;
 import ralf2oo2.netherstorage.NetherStorageClient;
@@ -11,6 +12,7 @@ import ralf2oo2.netherstorage.blockentity.NetherChestBlockEntity;
 import ralf2oo2.netherstorage.registry.BlockRegistry;
 
 import static ralf2oo2.netherstorage.block.NetherChestBlock.FACING;
+import static ralf2oo2.netherstorage.block.NetherChestBlock.PROTECTED;
 
 public class NetherChestBlockEntityRenderer extends BlockEntityRenderer {
 
@@ -74,7 +76,13 @@ public class NetherChestBlockEntityRenderer extends BlockEntityRenderer {
         GL11.glPushMatrix();
         GL11.glDisable(GL11.GL_LIGHTING);
         NetherChestBlockEntity netherChestBlockEntity = (NetherChestBlockEntity) blockEntity;
-        Direction facing = dispatcher.field_1557.getBlockState(netherChestBlockEntity.x, netherChestBlockEntity.y, netherChestBlockEntity.z).get(FACING);
+        BlockState state = dispatcher.field_1557.getBlockState(netherChestBlockEntity.x, netherChestBlockEntity.y, netherChestBlockEntity.z);
+        if(state == null || !state.contains(FACING) || !state.contains(PROTECTED)){
+            GL11.glEnable(GL11.GL_LIGHTING);
+            GL11.glPopMatrix();
+            return;
+        }
+        Direction facing = state.get(FACING);
 
         float brightness = dispatcher.field_1557.method_1782(blockEntity.x, blockEntity.y + 1, blockEntity.z);
 

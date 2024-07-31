@@ -107,9 +107,9 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
                 if(FabricLoader.INSTANCE.getEnvironmentType() == EnvType.SERVER) return true;
                 if(hitChestLock(world, x, y, z, player)){
                     blockEntity.playerName = player.name;
-                    PacketHelper.send(new SetChannelValuePacket(player.name, 0, x, y, z));
                     PacketHelper.send(new SetProtectedStatePacket(x, y ,z, true));
-                    if(!world.isRemote){
+                    PacketHelper.send(new SetChannelValuePacket(player.name, 0, x, y, z));
+                    if(world.isRemote){
                         world.setBlockState(x, y, z, world.getBlockState(x, y, z).with(PROTECTED, true));
                         blockEntity.cancelRemoval();
                         world.method_157(x, y, z, blockEntity);
@@ -180,7 +180,7 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
             blockEntity.playerName = "";
             PacketHelper.send(new SetChannelValuePacket("", 0, x, y, z));
             PacketHelper.send(new SetProtectedStatePacket(x, y ,z, false));
-            if(!world.isRemote){
+            if(world.isRemote){
                 world.setBlockState(x, y, z, world.getBlockState(x, y, z).with(PROTECTED, false));
                 blockEntity.cancelRemoval();
                 world.method_157(x, y, z, blockEntity);
