@@ -69,6 +69,9 @@ public class SetChannelValuePacket extends Packet implements IdentifiablePacket 
             case 3:
                 if(player.getHand() != null){
                     player.getHand().count--;
+                    if(player.getHand() != null && player.getHand().count == 0){
+                        player.inventory.main[player.inventory.selectedSlot] = null;
+                    }
                 }
                 blockEntity.channelColors[index - 1] = value;
                 break;

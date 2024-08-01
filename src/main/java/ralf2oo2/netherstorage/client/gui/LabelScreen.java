@@ -69,7 +69,6 @@ public class LabelScreen extends Screen {
                     else {
                         PacketHelper.send(new SetLabelPacket(channel, labelContent));
                     }
-                    System.out.println(labelContent);
                     this.minecraft.setScreen(null);
                 }
             }

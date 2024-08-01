@@ -3,7 +3,6 @@ package ralf2oo2.netherstorage.inventory;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
-import ralf2oo2.netherstorage.blockentity.NetherChestBlockEntity;
 import ralf2oo2.netherstorage.state.NetherChestState;
 
 public class NetherBagInventory implements Inventory {

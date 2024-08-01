@@ -58,7 +58,6 @@ public class SetProtectedStatePacket extends Packet implements IdentifiablePacke
         }
     }
 
-    //TODO: fix blockentity getting reset on client when changing blockstate on server
     @Override
     public void apply(NetworkHandler networkHandler) {
         PlayerEntity player = PlayerHelper.getPlayerFromPacketHandler(networkHandler);
@@ -69,6 +68,9 @@ public class SetProtectedStatePacket extends Packet implements IdentifiablePacke
             }
             else {
                 player.getHand().count--;
+                if(player.getHand() != null && player.getHand().count == 0){
+                    player.inventory.main[player.inventory.selectedSlot] = null;
+                }
             }
         }
 

@@ -36,8 +36,6 @@ public class SetLabelPacket extends Packet implements IdentifiablePacket {
 
         channel = readString(stream, 200);
         labelContent = readString(stream, 27);
-        System.out.println(channel);
-        System.out.println(labelContent);
     }
 
     @Override

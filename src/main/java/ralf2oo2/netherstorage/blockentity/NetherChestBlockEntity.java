@@ -20,7 +20,7 @@ import ralf2oo2.netherstorage.state.NetherChestState;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NetherChestBlockEntity extends BlockEntity {
+public class NetherChestBlockEntity extends BlockEntity implements Inventory{
     public String[] channelColors;
     public String playerName = "";
 
@@ -117,6 +117,7 @@ public class NetherChestBlockEntity extends BlockEntity {
                 }
             }
         }
+        getState().markDirty();
     }
 
     private PlayerEntity[] getPlayerEntitiesInRange(double range){
@@ -132,5 +133,44 @@ public class NetherChestBlockEntity extends BlockEntity {
         PlayerEntity[] playerEntityArray = new PlayerEntity[players.size()];
         playerEntityArray = (PlayerEntity[]) players.toArray(playerEntityArray);
         return playerEntityArray;
+    }
+
+    @Override
+    public int size() {
+        return getState().size();
+    }
+
+    @Override
+    public ItemStack getStack(int slot) {
+        return getState().getStack(slot);
+    }
+
+    @Override
+    public ItemStack removeStack(int slot, int amount) {
+        return getState().removeStack(slot, amount);
+    }
+
+    @Override
+    public void setStack(int slot, ItemStack stack) {
+        getState().setStack(slot, stack);
+    }
+
+    @Override
+    public String getName() {
+        return getState().getName();
+    }
+
+    @Override
+    public int getMaxCountPerStack() {
+        return getState().getMaxCountPerStack();
+    }
+
+    @Override
+    public boolean canPlayerUse(PlayerEntity player) {
+        if (!(this.world.getBlockEntity(this.x, this.y, this.z) instanceof NetherChestBlockEntity)) {
+            return false;
+        } else {
+            return !(player.method_1347((double)this.x + 0.5, (double)this.y + 0.5, (double)this.z + 0.5) > 64.0);
+        }
     }
 }

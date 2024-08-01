@@ -28,14 +28,12 @@ import net.modificationstation.stationapi.api.util.math.Direction;
 import ralf2oo2.netherstorage.NetherStorage;
 import ralf2oo2.netherstorage.NetherStorageClient;
 import ralf2oo2.netherstorage.blockentity.NetherChestBlockEntity;
-import ralf2oo2.netherstorage.inventory.NetherChestInventory;
 import ralf2oo2.netherstorage.item.NetherBagItem;
 import ralf2oo2.netherstorage.packet.clientbound.ShowLabelScreenPacket;
 import ralf2oo2.netherstorage.packet.serverbound.SetChannelValuePacket;
 import ralf2oo2.netherstorage.packet.serverbound.SetProtectedStatePacket;
 import ralf2oo2.netherstorage.packet.serverbound.ShowChestScreenPacket;
 import ralf2oo2.netherstorage.registry.ItemRegistry;
-import ralf2oo2.netherstorage.state.NetherChestState;
 
 import java.util.Random;
 
@@ -122,7 +120,7 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
                 }
                 else {
                     if(!world.isRemote){
-                        showChestScreen(player,  new NetherChestInventory(blockEntity, blockEntity.getState(), world), world);
+                        showChestScreen(player, blockEntity, world);
                     } else {
                         PacketHelper.send(new ShowChestScreenPacket(x, y, z));
                     }
@@ -144,7 +142,7 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
                     }
                     else {
                         if(!world.isRemote){
-                            showChestScreen(player,  new NetherChestInventory(blockEntity, blockEntity.getState(), world), world);
+                            showChestScreen(player, blockEntity, world);
                         } else {
                             PacketHelper.send(new ShowChestScreenPacket(x, y, z));
                         }
@@ -152,7 +150,7 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
                 }
                 else{
                     if(!world.isRemote){
-                        showChestScreen(player,  new NetherChestInventory(blockEntity, blockEntity.getState(), world), world);
+                        showChestScreen(player, blockEntity, world);
                     }
                     else {
                         PacketHelper.send(new ShowChestScreenPacket(x, y, z));
@@ -160,11 +158,11 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
                 }
             }
             else {
-                showChestScreen(player,  new NetherChestInventory(blockEntity, blockEntity.getState(), world), world);
+                showChestScreen(player, blockEntity, world);
             }
         }
         else {
-            showChestScreen(player,  new NetherChestInventory(blockEntity, blockEntity.getState(), world), world);
+            showChestScreen(player, blockEntity, world);
         }
         return true;
     }

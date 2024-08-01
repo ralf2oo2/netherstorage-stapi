@@ -9,7 +9,6 @@ import net.modificationstation.stationapi.api.network.packet.IdentifiablePacket;
 import net.modificationstation.stationapi.api.util.Identifier;
 import ralf2oo2.netherstorage.NetherStorage;
 import ralf2oo2.netherstorage.blockentity.NetherChestBlockEntity;
-import ralf2oo2.netherstorage.inventory.NetherChestInventory;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -54,7 +53,7 @@ public class ShowChestScreenPacket extends Packet implements IdentifiablePacket 
         if(player == null) return;
         BlockEntity blockEntity = player.world.getBlockEntity(x, y, z);
         if(!(blockEntity instanceof NetherChestBlockEntity)) return;
-        player.method_486( new NetherChestInventory((NetherChestBlockEntity)blockEntity, ((NetherChestBlockEntity)blockEntity).getState(), player.world));
+        player.method_486( (NetherChestBlockEntity)blockEntity );
     }
 
     @Override
