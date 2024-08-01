@@ -88,7 +88,7 @@ public class NetherChestBlockEntityRenderer extends BlockEntityRenderer {
         float brightness = dispatcher.field_1557.method_1782(blockEntity.x, blockEntity.y + 1, blockEntity.z);
 
         Block block = BlockRegistry.netherChest;
-        bindTexture("assets/netherstorage/textures/block/nether_chest_channel.png");
+        bindTexture("/assets/netherstorage/textures/block/nether_chest_channel.png");
         if(NetherStorageClient.storedColors.containsKey(new BlockPos(blockEntity.x, blockEntity.y, blockEntity.z))){
             ((NetherChestBlockEntity) blockEntity).channelColors = NetherStorageClient.storedColors.get(new BlockPos(blockEntity.x, blockEntity.y, blockEntity.z));
         }
