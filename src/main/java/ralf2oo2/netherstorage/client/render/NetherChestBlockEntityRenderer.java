@@ -8,6 +8,7 @@ import net.minecraft.util.math.BlockPos;
 import net.modificationstation.stationapi.api.block.BlockState;
 import net.modificationstation.stationapi.api.util.math.Direction;
 import org.lwjgl.opengl.GL11;
+import ralf2oo2.netherstorage.NetherStorage;
 import ralf2oo2.netherstorage.NetherStorageClient;
 import ralf2oo2.netherstorage.blockentity.NetherChestBlockEntity;
 import ralf2oo2.netherstorage.registry.BlockRegistry;
@@ -16,61 +17,6 @@ import static ralf2oo2.netherstorage.block.NetherChestBlock.FACING;
 import static ralf2oo2.netherstorage.block.NetherChestBlock.PROTECTED;
 
 public class NetherChestBlockEntityRenderer extends BlockEntityRenderer {
-
-    private int getColorFromString(String colorString){
-        int color = 0xFFFFFF;
-        switch (colorString){
-            case "white":
-                color = 0xFFFFFF;
-                break;
-            case "black":
-                color = 0x181414;
-                break;
-            case "purple":
-                color = 0x7e34bf;
-                break;
-            case "cyan":
-                color = 0x267191;
-                break;
-            case "light_gray":
-                color = 0xa0a7a7;
-                break;
-            case "gray":
-                color = 0x414141;
-                break;
-            case "pink":
-                color = 0xd98199;
-                break;
-            case "lime":
-                color = 0x39ba2e;
-                break;
-            case "light_blue":
-                color = 0x6387d2;
-                break;
-            case "magenta":
-                color = 0xbe49c9;
-                break;
-            case "orange":
-                color = 0xea7e35;
-                break;
-            case "brown":
-                color = 0x56331c;
-                break;
-            case "green":
-                color = 0x364b18;
-                break;
-            case "blue":
-                color = 0x253193;
-                break;
-            case "yellow":
-                color = 0xc2b51c;
-                break;
-            case "red":
-                color = 0x9e2b27;
-                break;
-        }
-        return color;
-    }
     @Override
     public void render(BlockEntity blockEntity, double x, double y, double z, float f) {
 
@@ -93,13 +39,13 @@ public class NetherChestBlockEntityRenderer extends BlockEntityRenderer {
             ((NetherChestBlockEntity) blockEntity).channelColors = NetherStorageClient.storedColors.get(new BlockPos(blockEntity.x, blockEntity.y, blockEntity.z));
         }
 
-        setGlColor(getColorFromString(netherChestBlockEntity.channelColors[0]), brightness);
+        setGlColor(NetherStorage.getColorFromString(netherChestBlockEntity.channelColors[0]), brightness);
         renderColorCube(x, y, z, 0, facing);
 
-        setGlColor(getColorFromString(netherChestBlockEntity.channelColors[1]), brightness);
+        setGlColor(NetherStorage.getColorFromString(netherChestBlockEntity.channelColors[1]), brightness);
         renderColorCube(x, y, z, 4, facing);
 
-        setGlColor(getColorFromString(netherChestBlockEntity.channelColors[2]), brightness);
+        setGlColor(NetherStorage.getColorFromString(netherChestBlockEntity.channelColors[2]), brightness);
         renderColorCube(x, y, z, 8, facing);
         GL11.glEnable(GL11.GL_LIGHTING);
         GL11.glPopMatrix();

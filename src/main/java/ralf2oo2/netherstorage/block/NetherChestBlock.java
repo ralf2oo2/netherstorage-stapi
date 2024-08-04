@@ -33,6 +33,7 @@ import ralf2oo2.netherstorage.packet.clientbound.ShowLabelScreenPacket;
 import ralf2oo2.netherstorage.packet.serverbound.SetChannelValuePacket;
 import ralf2oo2.netherstorage.packet.serverbound.SetProtectedStatePacket;
 import ralf2oo2.netherstorage.packet.serverbound.ShowChestScreenPacket;
+import ralf2oo2.netherstorage.registry.BlockRegistry;
 import ralf2oo2.netherstorage.registry.ItemRegistry;
 
 import java.util.Random;
@@ -89,6 +90,15 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
                 NbtCompound nbtCompound = player.getHand().getStationNbt();
                 nbtCompound.putString("channel", blockEntity.getChannel());
                 nbtCompound.putString("label", blockEntity.getLabel());
+                nbtCompound.putString("color1", blockEntity.channelColors[0]);
+                nbtCompound.putString("color2", blockEntity.channelColors[1]);
+                nbtCompound.putString("color3", blockEntity.channelColors[2]);
+                if(world.getBlockId(x, y, z) == BlockRegistry.netherChest.id && world.getBlockState(x, y, z).get(PROTECTED).booleanValue()){
+                    nbtCompound.putString("playerName", blockEntity.playerName);
+                }
+                else {
+                    nbtCompound.putString("playerName", "");
+                }
             }
             else if(player.getHand().itemId == ItemRegistry.netherLabelItem.id){
                 if(FabricLoader.INSTANCE.getEnvironmentType() == EnvType.CLIENT){

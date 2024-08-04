@@ -25,7 +25,8 @@
       "ralf2oo2.netherstorage.registry.PacketRegistry"
     ],
     "stationapi:event_bus_client": [
-      "ralf2oo2.netherstorage.registry.BlockEntityRendererRegistry"
+      "ralf2oo2.netherstorage.registry.BlockEntityRendererRegistry",
+      "ralf2oo2.netherstorage.registry.ColorProviderRegistry"
     ],
     "stationapi:event_bus_server": [
     ]

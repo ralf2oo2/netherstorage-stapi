@@ -11,7 +11,10 @@ import net.modificationstation.stationapi.api.template.item.TemplateItem;
 import net.modificationstation.stationapi.api.util.Identifier;
 import ralf2oo2.netherstorage.NetherStorage;
 import ralf2oo2.netherstorage.NetherStorageClient;
+import ralf2oo2.netherstorage.block.NetherChestBlock;
+import ralf2oo2.netherstorage.blockentity.NetherChestBlockEntity;
 import ralf2oo2.netherstorage.inventory.NetherBagInventory;
+import ralf2oo2.netherstorage.registry.BlockRegistry;
 import ralf2oo2.netherstorage.state.NetherChestState;
 
 public class NetherBagItem extends TemplateItem{
@@ -34,6 +37,28 @@ public class NetherBagItem extends TemplateItem{
             }
         }
         return stack;
+    }
+
+    @Override
+    public boolean useOnBlock(ItemStack stack, PlayerEntity user, World world, int x, int y, int z, int side) {
+        if(world.getBlockId(x, y, z) == BlockRegistry.netherChest.id && user.method_1373()){
+            NetherChestBlockEntity blockEntity = (NetherChestBlockEntity) world.getBlockEntity(x, y, z);
+            NbtCompound nbtCompound = stack.getStationNbt();
+            nbtCompound.putString("channel", blockEntity.getChannel());
+            nbtCompound.putString("label", blockEntity.getLabel());
+            nbtCompound.putString("color1", blockEntity.channelColors[0]);
+            nbtCompound.putString("color2", blockEntity.channelColors[1]);
+            nbtCompound.putString("color3", blockEntity.channelColors[2]);
+            nbtCompound.putString("playerName", blockEntity.playerName);
+            if(world.getBlockState(x, y, z).get(NetherChestBlock.PROTECTED).booleanValue()){
+                nbtCompound.putString("playerName", blockEntity.playerName);
+            }
+            else {
+                nbtCompound.putString("playerName", "");
+            }
+            return true;
+        }
+        return false;
     }
 
     private NetherChestState getState(String id, String channel, World world){

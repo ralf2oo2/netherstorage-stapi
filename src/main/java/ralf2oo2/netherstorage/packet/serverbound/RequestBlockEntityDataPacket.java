@@ -53,6 +53,7 @@ public class RequestBlockEntityDataPacket extends Packet implements Identifiable
         PlayerEntity player = PlayerHelper.getPlayerFromPacketHandler(networkHandler);
         if(player == null) return;
         NetherChestBlockEntity blockEntity = (NetherChestBlockEntity) player.world.getBlockEntity(x, y, z);
+        if(blockEntity == null) return;
         PacketHelper.sendTo(player, new SendBlockEntityDataPacket(x, y, z, blockEntity.playerName, blockEntity.channelColors[0], blockEntity.channelColors[1], blockEntity.channelColors[2]));
     }
 
