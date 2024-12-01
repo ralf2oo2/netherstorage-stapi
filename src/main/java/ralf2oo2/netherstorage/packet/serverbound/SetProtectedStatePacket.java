@@ -6,25 +6,28 @@ import net.minecraft.network.NetworkHandler;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.world.World;
 import net.modificationstation.stationapi.api.entity.player.PlayerHelper;
-import net.modificationstation.stationapi.api.network.packet.IdentifiablePacket;
-import net.modificationstation.stationapi.api.network.packet.PacketHelper;
+import net.modificationstation.stationapi.api.network.packet.ManagedPacket;
+import net.modificationstation.stationapi.api.network.packet.PacketType;
+import net.modificationstation.stationapi.api.registry.PacketTypeRegistry;
+import net.modificationstation.stationapi.api.registry.Registry;
 import net.modificationstation.stationapi.api.util.Identifier;
+import org.jetbrains.annotations.NotNull;
 import ralf2oo2.netherstorage.NetherStorage;
 import ralf2oo2.netherstorage.block.NetherChestBlock;
 import ralf2oo2.netherstorage.blockentity.NetherChestBlockEntity;
-import ralf2oo2.netherstorage.packet.clientbound.SendBlockEntityDataPacket;
 import ralf2oo2.netherstorage.registry.BlockRegistry;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class SetProtectedStatePacket extends Packet implements IdentifiablePacket {
+public class SetProtectedStatePacket extends Packet implements ManagedPacket<SetProtectedStatePacket> {
 
     private int x;
     private int y;
     private int z;
     private boolean state;
+    public static final PacketType<SetProtectedStatePacket> TYPE = PacketType.builder(false, true, SetProtectedStatePacket::new).build();
     public static final Identifier ID = Identifier.of(NetherStorage.NAMESPACE, "set_protected_state");
 
     public SetProtectedStatePacket(){}
@@ -98,12 +101,12 @@ public class SetProtectedStatePacket extends Packet implements IdentifiablePacke
         return 4 * 4;
     }
 
-    @Override
-    public Identifier getId() {
-        return ID;
+    public static void register(){
+        Registry.register(PacketTypeRegistry.INSTANCE, ID, TYPE);
     }
 
-    public static void register(){
-        IdentifiablePacket.register(ID, false, true, SetProtectedStatePacket::new);
+    @Override
+    public @NotNull PacketType<SetProtectedStatePacket> getType() {
+        return TYPE;
     }
 }

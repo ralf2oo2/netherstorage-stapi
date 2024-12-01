@@ -5,8 +5,12 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.NetworkHandler;
 import net.minecraft.network.packet.Packet;
 import net.modificationstation.stationapi.api.entity.player.PlayerHelper;
-import net.modificationstation.stationapi.api.network.packet.IdentifiablePacket;
+import net.modificationstation.stationapi.api.network.packet.ManagedPacket;
+import net.modificationstation.stationapi.api.network.packet.PacketType;
+import net.modificationstation.stationapi.api.registry.PacketTypeRegistry;
+import net.modificationstation.stationapi.api.registry.Registry;
 import net.modificationstation.stationapi.api.util.Identifier;
+import org.jetbrains.annotations.NotNull;
 import ralf2oo2.netherstorage.NetherStorage;
 import ralf2oo2.netherstorage.blockentity.NetherChestBlockEntity;
 
@@ -14,10 +18,11 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class ShowChestScreenPacket extends Packet implements IdentifiablePacket {
+public class ShowChestScreenPacket extends Packet implements ManagedPacket<ShowChestScreenPacket> {
     private int x;
     private int y;
     private int z;
+    public static final PacketType<ShowChestScreenPacket> TYPE = PacketType.builder(false, true, ShowChestScreenPacket::new).build();
     public static final Identifier ID = Identifier.of(NetherStorage.NAMESPACE, "show_chest_screen");
     public ShowChestScreenPacket(){}
     public ShowChestScreenPacket(int x, int y, int z){
@@ -60,12 +65,12 @@ public class ShowChestScreenPacket extends Packet implements IdentifiablePacket 
     public int size() {
         return 3 * 4;
     }
+    public static void register(){
+        Registry.register(PacketTypeRegistry.INSTANCE, ID, TYPE);
+    }
 
     @Override
-    public Identifier getId() {
-        return ID;
-    }
-    public static void register(){
-        IdentifiablePacket.register(ID, false, true, ShowChestScreenPacket::new);
+    public @NotNull PacketType<ShowChestScreenPacket> getType() {
+        return TYPE;
     }
 }

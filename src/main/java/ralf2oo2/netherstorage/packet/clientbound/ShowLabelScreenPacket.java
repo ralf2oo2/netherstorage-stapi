@@ -2,19 +2,23 @@ package ralf2oo2.netherstorage.packet.clientbound;
 
 import net.minecraft.network.NetworkHandler;
 import net.minecraft.network.packet.Packet;
-import net.modificationstation.stationapi.api.network.packet.IdentifiablePacket;
+import net.modificationstation.stationapi.api.network.packet.ManagedPacket;
+import net.modificationstation.stationapi.api.network.packet.PacketType;
+import net.modificationstation.stationapi.api.registry.PacketTypeRegistry;
+import net.modificationstation.stationapi.api.registry.Registry;
 import net.modificationstation.stationapi.api.util.Identifier;
+import org.jetbrains.annotations.NotNull;
 import ralf2oo2.netherstorage.NetherStorage;
 import ralf2oo2.netherstorage.NetherStorageClient;
-import ralf2oo2.netherstorage.packet.serverbound.SetLabelPacket;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 
-public class ShowLabelScreenPacket extends Packet implements IdentifiablePacket {
+public class ShowLabelScreenPacket extends Packet implements ManagedPacket<ShowLabelScreenPacket> {
 
     private String channel;
     private String label;
+    public static final PacketType<ShowLabelScreenPacket> TYPE = PacketType.builder(true, false, ShowLabelScreenPacket::new).build();
     public static final Identifier ID = Identifier.of(NetherStorage.NAMESPACE, "show_label_screen");
     public ShowLabelScreenPacket(){}
     public ShowLabelScreenPacket(String channel, String label){
@@ -43,12 +47,12 @@ public class ShowLabelScreenPacket extends Packet implements IdentifiablePacket 
         return channel.length() + label.length();
     }
 
-    @Override
-    public Identifier getId() {
-        return ID;
+    public static void register(){
+        Registry.register(PacketTypeRegistry.INSTANCE, ID, TYPE);
     }
 
-    public static void register(){
-        IdentifiablePacket.register(ID, true, false, ShowLabelScreenPacket::new);
+    @Override
+    public @NotNull PacketType<ShowLabelScreenPacket> getType() {
+        return TYPE;
     }
 }

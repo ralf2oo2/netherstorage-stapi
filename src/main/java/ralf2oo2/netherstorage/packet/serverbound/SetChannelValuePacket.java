@@ -4,22 +4,26 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.NetworkHandler;
 import net.minecraft.network.packet.Packet;
 import net.modificationstation.stationapi.api.entity.player.PlayerHelper;
-import net.modificationstation.stationapi.api.network.packet.IdentifiablePacket;
+import net.modificationstation.stationapi.api.network.packet.ManagedPacket;
+import net.modificationstation.stationapi.api.network.packet.PacketType;
+import net.modificationstation.stationapi.api.registry.PacketTypeRegistry;
+import net.modificationstation.stationapi.api.registry.Registry;
 import net.modificationstation.stationapi.api.util.Identifier;
+import org.jetbrains.annotations.NotNull;
 import ralf2oo2.netherstorage.NetherStorage;
 import ralf2oo2.netherstorage.blockentity.NetherChestBlockEntity;
-import ralf2oo2.netherstorage.state.NetherChestState;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class SetChannelValuePacket extends Packet implements IdentifiablePacket {
+public class SetChannelValuePacket extends Packet implements ManagedPacket<SetChannelValuePacket> {
     private String value;
     private int index;
     private int x;
     private int y;
     private int z;
+    public static final PacketType<SetChannelValuePacket> TYPE = PacketType.builder(false, true, SetChannelValuePacket::new).build();
     public static final Identifier ID = Identifier.of(NetherStorage.NAMESPACE, "set_channel_value");
     public SetChannelValuePacket(){}
     public SetChannelValuePacket(String value, int index, int x, int y, int z){
@@ -84,12 +88,12 @@ public class SetChannelValuePacket extends Packet implements IdentifiablePacket 
         return value.length() + (4 * 4);
     }
 
-    @Override
-    public Identifier getId() {
-        return ID;
+    public static void register(){
+        Registry.register(PacketTypeRegistry.INSTANCE, ID, TYPE);
     }
 
-    public static void register(){
-        IdentifiablePacket.register(ID, false, true, SetChannelValuePacket::new);
+    @Override
+    public @NotNull PacketType<SetChannelValuePacket> getType() {
+        return TYPE;
     }
 }

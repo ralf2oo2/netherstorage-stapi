@@ -4,20 +4,22 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.network.NetworkHandler;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.server.MinecraftServer;
-import net.modificationstation.stationapi.api.network.packet.IdentifiablePacket;
-import net.modificationstation.stationapi.api.network.packet.PacketHelper;
+import net.modificationstation.stationapi.api.network.packet.ManagedPacket;
+import net.modificationstation.stationapi.api.network.packet.PacketType;
+import net.modificationstation.stationapi.api.registry.PacketTypeRegistry;
+import net.modificationstation.stationapi.api.registry.Registry;
 import net.modificationstation.stationapi.api.util.Identifier;
+import org.jetbrains.annotations.NotNull;
 import ralf2oo2.netherstorage.NetherStorage;
 import ralf2oo2.netherstorage.state.NetherChestState;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 
-public class SetLabelPacket extends Packet implements IdentifiablePacket {
+public class SetLabelPacket extends Packet implements ManagedPacket<SetLabelPacket> {
     private String channel;
     private String labelContent;
+    public static final PacketType<SetLabelPacket> TYPE = PacketType.builder(false, true, SetLabelPacket::new).build();
     public static final Identifier ID = Identifier.of(NetherStorage.NAMESPACE, "set_label");
 
     public SetLabelPacket(String channel, String labelContent){
@@ -25,10 +27,6 @@ public class SetLabelPacket extends Packet implements IdentifiablePacket {
         this.labelContent = labelContent;
     }
     public SetLabelPacket(){
-    }
-    @Override
-    public Identifier getId() {
-        return ID;
     }
 
     @Override
@@ -62,7 +60,11 @@ public class SetLabelPacket extends Packet implements IdentifiablePacket {
     }
 
     public static void register(){
-        IdentifiablePacket.register(ID, false, true, SetLabelPacket::new);
+        Registry.register(PacketTypeRegistry.INSTANCE, ID, TYPE);
     }
 
+    @Override
+    public @NotNull PacketType<SetLabelPacket> getType() {
+        return TYPE;
+    }
 }

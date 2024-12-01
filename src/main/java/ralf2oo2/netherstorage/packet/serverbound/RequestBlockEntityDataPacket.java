@@ -4,9 +4,13 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.NetworkHandler;
 import net.minecraft.network.packet.Packet;
 import net.modificationstation.stationapi.api.entity.player.PlayerHelper;
-import net.modificationstation.stationapi.api.network.packet.IdentifiablePacket;
+import net.modificationstation.stationapi.api.network.packet.ManagedPacket;
 import net.modificationstation.stationapi.api.network.packet.PacketHelper;
+import net.modificationstation.stationapi.api.network.packet.PacketType;
+import net.modificationstation.stationapi.api.registry.PacketTypeRegistry;
+import net.modificationstation.stationapi.api.registry.Registry;
 import net.modificationstation.stationapi.api.util.Identifier;
+import org.jetbrains.annotations.NotNull;
 import ralf2oo2.netherstorage.NetherStorage;
 import ralf2oo2.netherstorage.blockentity.NetherChestBlockEntity;
 import ralf2oo2.netherstorage.packet.clientbound.SendBlockEntityDataPacket;
@@ -15,10 +19,11 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class RequestBlockEntityDataPacket extends Packet implements IdentifiablePacket {
+public class RequestBlockEntityDataPacket extends Packet implements ManagedPacket<RequestBlockEntityDataPacket> {
     private int x;
     private int y;
     private int z;
+    public static final PacketType<RequestBlockEntityDataPacket> TYPE = PacketType.builder(false, true, RequestBlockEntityDataPacket::new).build();
     public static final Identifier ID = Identifier.of(NetherStorage.NAMESPACE, "request_block_entity_data");
     public RequestBlockEntityDataPacket(){}
     public RequestBlockEntityDataPacket(int x, int y, int z){
@@ -62,12 +67,12 @@ public class RequestBlockEntityDataPacket extends Packet implements Identifiable
         return 4 * 3;
     }
 
-    @Override
-    public Identifier getId() {
-        return ID;
+    public static void register(){
+        Registry.register(PacketTypeRegistry.INSTANCE, ID, TYPE);
     }
 
-    public static void register(){
-        IdentifiablePacket.register(ID, false, true, RequestBlockEntityDataPacket::new);
+    @Override
+    public @NotNull PacketType<RequestBlockEntityDataPacket> getType() {
+        return TYPE;
     }
 }
