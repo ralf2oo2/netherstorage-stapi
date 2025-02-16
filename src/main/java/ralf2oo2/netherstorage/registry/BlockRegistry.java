@@ -11,7 +11,7 @@ import ralf2oo2.netherstorage.block.NetherChestBlock;
 public class BlockRegistry {
     public static Block netherChest;
     @EventListener
-    private static void registerBlocks(BlockRegistryEvent event) {
+    public static void registerBlocks(BlockRegistryEvent event) {
         netherChest = new NetherChestBlock(Identifier.of(NetherStorage.NAMESPACE, "nether_chest"), Material.WOOD).setTranslationKey(NetherStorage.NAMESPACE, "nether_chest");
     }
 }

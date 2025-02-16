@@ -8,7 +8,7 @@ import ralf2oo2.netherstorage.packet.serverbound.*;
 
 public class PacketRegistry{
     @EventListener
-    private static void registerPackets(PacketRegisterEvent event) {
+    public static void registerPackets(PacketRegisterEvent event) {
         SetLabelPacket.register();
         ShowLabelScreenPacket.register();
         SetChannelValuePacket.register();

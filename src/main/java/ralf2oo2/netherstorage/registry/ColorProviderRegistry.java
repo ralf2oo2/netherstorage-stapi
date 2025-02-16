@@ -7,7 +7,7 @@ import ralf2oo2.netherstorage.colorprovider.NetherBagColorProvider;
 public class ColorProviderRegistry {
 
     @EventListener
-    private static void registerItemColors(ItemColorsRegisterEvent event) {
+    public static void registerItemColors(ItemColorsRegisterEvent event) {
         event.itemColors.register(new NetherBagColorProvider(), ItemRegistry.blackNetherBagItem);
         event.itemColors.register(new NetherBagColorProvider(), ItemRegistry.blueNetherBagItem);
         event.itemColors.register(new NetherBagColorProvider(), ItemRegistry.brownNetherBagItem);

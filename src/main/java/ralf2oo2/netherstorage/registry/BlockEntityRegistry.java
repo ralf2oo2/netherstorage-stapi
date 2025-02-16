@@ -11,7 +11,7 @@ import ralf2oo2.netherstorage.blockentity.NetherChestBlockEntity;
 
 public class BlockEntityRegistry {
     @EventListener
-    private static void registerBlockEntities(BlockEntityRegisterEvent event) {
+    public static void registerBlockEntities(BlockEntityRegisterEvent event) {
         event.register(NetherChestBlockEntity.class, "nether_chest");
     }
 }

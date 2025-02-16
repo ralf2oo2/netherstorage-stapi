@@ -28,7 +28,7 @@ public class ItemRegistry {
     public static Item whiteNetherBagItem;
     public static Item yellowNetherBagItem;
     @EventListener
-    private static void registerItems(ItemRegistryEvent event) {
+    public static void registerItems(ItemRegistryEvent event) {
         netherLabelItem = new NetherLabelItem(NetherStorage.NAMESPACE.id("nether_label")).setTranslationKey(NetherStorage.NAMESPACE, "nether_label");
         netherCoreItem = new NetherCoreItem(NetherStorage.NAMESPACE.id("nether_core")).setTranslationKey(NetherStorage.NAMESPACE, "nether_core");
 
