@@ -58,7 +58,7 @@ public class ShowChestScreenPacket extends Packet implements ManagedPacket<ShowC
         if(player == null) return;
         BlockEntity blockEntity = player.world.getBlockEntity(x, y, z);
         if(!(blockEntity instanceof NetherChestBlockEntity)) return;
-        player.method_486( (NetherChestBlockEntity)blockEntity );
+        player.openChestScreen( (NetherChestBlockEntity)blockEntity );
     }
 
     @Override

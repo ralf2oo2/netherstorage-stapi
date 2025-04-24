@@ -23,7 +23,7 @@ public class NetherChestBlockEntityRenderer extends BlockEntityRenderer {
         GL11.glPushMatrix();
         GL11.glDisable(GL11.GL_LIGHTING);
         NetherChestBlockEntity netherChestBlockEntity = (NetherChestBlockEntity) blockEntity;
-        BlockState state = dispatcher.field_1557.getBlockState(netherChestBlockEntity.x, netherChestBlockEntity.y, netherChestBlockEntity.z);
+        BlockState state = dispatcher.world.getBlockState(netherChestBlockEntity.x, netherChestBlockEntity.y, netherChestBlockEntity.z);
         if(state == null || !state.contains(FACING) || !state.contains(PROTECTED)){
             GL11.glEnable(GL11.GL_LIGHTING);
             GL11.glPopMatrix();
@@ -31,7 +31,7 @@ public class NetherChestBlockEntityRenderer extends BlockEntityRenderer {
         }
         Direction facing = state.get(FACING);
 
-        float brightness = dispatcher.field_1557.method_1782(blockEntity.x, blockEntity.y + 1, blockEntity.z);
+        float brightness = dispatcher.world.method_1782(blockEntity.x, blockEntity.y + 1, blockEntity.z);
 
         Block block = BlockRegistry.netherChest;
         bindTexture("/assets/netherstorage/textures/block/nether_chest_channel.png");

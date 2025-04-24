@@ -3,8 +3,8 @@ package ralf2oo2.netherstorage.block;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.FabricLoader;
 import net.minecraft.block.Block;
-import net.minecraft.block.Material;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.material.Material;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -86,7 +86,7 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
             if(shouldIgnoreActions(player.getHand())){
                 return false;
             }
-            else if(player.getHand().getItem() instanceof NetherBagItem && player.method_1373()){
+            else if(player.getHand().getItem() instanceof NetherBagItem && player.isSneaking()){
                 NbtCompound nbtCompound = player.getHand().getStationNbt();
                 nbtCompound.putString("channel", blockEntity.getChannel());
                 nbtCompound.putString("label", blockEntity.getLabel());
@@ -118,8 +118,8 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
                         changingBlockstate = true;
                         world.setBlockState(x, y, z, world.getBlockState(x, y, z).with(PROTECTED, true));
                         blockEntity.cancelRemoval();
-                        world.method_157(x, y, z, blockEntity);
-                        world.method_246(x, y, z);
+                        world.setBlockEntity(x, y, z, blockEntity);
+                        world.setBlockDirty(x, y, z);
                         changingBlockstate = false;
                         player.getHand().count--;
                     } else {
@@ -148,7 +148,7 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
                         } else {
                             PacketHelper.send(new SetChannelValuePacket(color, hitColorBlock + 1, x, y, z));
                         }
-                        world.method_246(x, y, z);
+                        world.setBlockDirty(x, y, z);
                     }
                     else {
                         if(!world.isRemote){
@@ -186,11 +186,11 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
     private void showChestScreen(PlayerEntity player, Inventory state, World world){
         if(FabricLoader.INSTANCE.getEnvironmentType() == EnvType.CLIENT){
             if(!world.isRemote){
-                player.method_486(state);
+                player.openChestScreen(state);
             }
         }
         else {
-            player.method_486(state);
+            player.openChestScreen(state);
         }
     }
 
@@ -204,8 +204,8 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
                 changingBlockstate = true;
                 world.setBlockState(x, y, z, world.getBlockState(x, y, z).with(PROTECTED, false));
                 blockEntity.cancelRemoval();
-                world.method_157(x, y, z, blockEntity);
-                world.method_246(x, y, z);
+                world.setBlockEntity(x, y, z, blockEntity);
+                world.setBlockDirty(x, y, z);
                 changingBlockstate = false;
                 ejectDiamond(world, x, y, z);
             } else {
@@ -229,7 +229,7 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
                 var12.velocityX = ((float)this.random.nextGaussian() * var13);
                 var12.velocityY = ((float)this.random.nextGaussian() * var13 + 0.2F);
                 var12.velocityZ = ((float)this.random.nextGaussian() * var13);
-                world.method_210(var12);
+                world.spawnEntity(var12);
             }
         }
         super.onBreak(world, x, y, z);
@@ -257,7 +257,7 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
         Vec3d playerPos = Vec3d.create(player.x, player.y, player.z);
 
         Vec3d targetPos = Vec3d.create(targetX, targetY, targetZ);
-        HitResult hitResult = world.method_162(playerPos, targetPos, true, true);
+        HitResult hitResult = world.raycast(playerPos, targetPos, true, true);
         Direction facing = world.getBlockState(x, y, z).get(FACING);
         double hitPixelX = (hitResult.pos.x - x) / 10 * 16;
         double hitPixelY = (hitResult.pos.y - y) / 10 * 16;
@@ -329,7 +329,7 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
         Vec3d playerPos = Vec3d.create(player.x, player.y, player.z);
 
         Vec3d targetPos = Vec3d.create(targetX, targetY, targetZ);
-        HitResult hitResult = world.method_162(playerPos, targetPos, true, true);
+        HitResult hitResult = world.raycast(playerPos, targetPos, true, true);
         Direction facing = world.getBlockState(x, y, z).get(FACING);
         double hitPixelX = (hitResult.pos.x - x) / 10 * 16;
         double hitPixelY = (hitResult.pos.y - y) / 10 * 16;
@@ -413,6 +413,6 @@ public class NetherChestBlock extends TemplateBlockWithEntity {
         var24.velocityX += random.nextGaussian() * 0.007499999832361937 * 6.0;
         var24.velocityY += random.nextGaussian() * 0.007499999832361937 * 6.0;
         var24.velocityZ += random.nextGaussian() * 0.007499999832361937 * 6.0;
-        world.method_210(var24);
+        world.spawnEntity(var24);
     }
 }

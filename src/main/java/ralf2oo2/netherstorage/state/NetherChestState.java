@@ -6,10 +6,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.world.PersistentState;
-import net.minecraft.world.PersistentStateManager;
-import ralf2oo2.netherstorage.NetherStorage;
 import ralf2oo2.netherstorage.item.NetherBagItem;
-import ralf2oo2.netherstorage.registry.ItemRegistry;
 
 public class NetherChestState extends PersistentState implements Inventory {
     public String channel = "";

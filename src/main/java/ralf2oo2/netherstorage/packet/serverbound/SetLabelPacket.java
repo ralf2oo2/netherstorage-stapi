@@ -45,8 +45,8 @@ public class SetLabelPacket extends Packet implements ManagedPacket<SetLabelPack
     @Override
     public void apply(NetworkHandler networkHandler) {
         MinecraftServer server = ((MinecraftServer) FabricLoader.getInstance().getGameInstance());
-        for(int i = 0; i < server.field_2841.length; i++){
-            NetherChestState state = (NetherChestState) server.field_2841[i].getOrCreateState(NetherChestState.class, NetherStorage.getStateId() + channel);
+        for(int i = 0; i < server.worlds.length; i++){
+            NetherChestState state = (NetherChestState) server.worlds[i].getOrCreateState(NetherChestState.class, NetherStorage.getStateId() + channel);
             if(state != null){
                 state.label = labelContent;
                 state.markDirty();

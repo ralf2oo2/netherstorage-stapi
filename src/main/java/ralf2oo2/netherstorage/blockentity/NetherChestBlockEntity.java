@@ -122,9 +122,9 @@ public class NetherChestBlockEntity extends BlockEntity implements Inventory{
 
     private PlayerEntity[] getPlayerEntitiesInRange(double range){
         List players = new ArrayList<PlayerEntity>();
-        for(int var12 = 0; var12 < world.field_200.size(); ++var12) {
-            PlayerEntity player = (PlayerEntity)world.field_200.get(var12);
-            double distance = player.method_1347(x, y, z);
+        for(int var12 = 0; var12 < world.players.size(); ++var12) {
+            PlayerEntity player = (PlayerEntity)world.players.get(var12);
+            double distance = player.getSquaredDistance(x, y, z);
 
             if (distance < range && player.dimensionId == world.dimension.id) {
                 players.add(player);
@@ -170,7 +170,7 @@ public class NetherChestBlockEntity extends BlockEntity implements Inventory{
         if (!(this.world.getBlockEntity(this.x, this.y, this.z) instanceof NetherChestBlockEntity)) {
             return false;
         } else {
-            return !(player.method_1347((double)this.x + 0.5, (double)this.y + 0.5, (double)this.z + 0.5) > 64.0);
+            return !(player.getSquaredDistance((double)this.x + 0.5, (double)this.y + 0.5, (double)this.z + 0.5) > 64.0);
         }
     }
 }

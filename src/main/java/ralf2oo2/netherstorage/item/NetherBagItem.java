@@ -33,7 +33,7 @@ public class NetherBagItem extends TemplateItem{
         if(channel != null && !channel.equals("")){
             NetherChestState state = getState(NetherStorage.getStateId() + channel, channel, world);
             if(state != null){
-                user.method_486(new NetherBagInventory(stack, user, state));
+                user.openChestScreen(new NetherBagInventory(stack, user, state));
             }
         }
         return stack;
@@ -41,7 +41,7 @@ public class NetherBagItem extends TemplateItem{
 
     @Override
     public boolean useOnBlock(ItemStack stack, PlayerEntity user, World world, int x, int y, int z, int side) {
-        if(world.getBlockId(x, y, z) == BlockRegistry.netherChest.id && user.method_1373()){
+        if(world.getBlockId(x, y, z) == BlockRegistry.netherChest.id && user.isSneaking()){
             NetherChestBlockEntity blockEntity = (NetherChestBlockEntity) world.getBlockEntity(x, y, z);
             NbtCompound nbtCompound = stack.getStationNbt();
             nbtCompound.putString("channel", blockEntity.getChannel());
