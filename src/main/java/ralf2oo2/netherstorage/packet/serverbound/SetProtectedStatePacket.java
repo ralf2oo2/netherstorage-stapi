@@ -85,7 +85,7 @@ public class SetProtectedStatePacket extends Packet implements ManagedPacket<Set
 
         NetherChestBlockEntity blockEntity = (NetherChestBlockEntity) world.getBlockEntity(x, y, z);
         NetherChestBlock.changingBlockstate = true;
-        world.setBlockStateWithNotify(x, y, z, world.getBlockState(x, y, z).with(NetherChestBlock.PROTECTED, state));
+        world.setBlockState(x, y, z, world.getBlockState(x, y, z).with(NetherChestBlock.PROTECTED, state));
         blockEntity.cancelRemoval();
         world.setBlockEntity(x, y, z, blockEntity);
         world.setBlockDirty(x, y, z);
